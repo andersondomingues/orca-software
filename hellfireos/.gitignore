@@ -1,0 +1,7 @@
+*.o
+code*.lst
+code*.elf
+code*.cnt
+code*.bin
+code*.txt
+code*.sec
