@@ -25,7 +25,8 @@
 //#include "../../../applications/cpp-float-mult/include/cpp-float-mult.h"
 //#include "../../../applications/cpp-mult/include/cpp-mult.h"
 //#include "../../../applications/mnist/include/mnist.h"
-#include "../../../applications/mnist-ext-mult/include/mnist-ext-mult.h"
+//#include "../../../applications/mnist-ext-mult/include/mnist-ext-mult.h"
+#include "../../../applications/mnist-ext-vet-mult/include/mnist-ext-vet-mult.h"
 //#include "../../../applications/cpp-mult/include/cpp-mult.h"
 //#include "../../../applications/ann/include/ann.h" 
 //#include "../../../applications/producer-consumer/include/producer-consumer.h" 
@@ -49,7 +50,8 @@ void app_main(void)
 	//hf_spawn(float_mult,  5, 4, 5, "float_mult", 1024);   //10%
 	//hf_spawn(cpp_float_mult,  5, 4, 5, "cpp_float_mult", 1024);   //10%
 	//hf_spawn(mnist, 5, 4, 5, "mnist", 128 * 1024);   // 128 Kbytes !!!
-	hf_spawn(mnist_ext_mult, 5, 4, 5, "mnist_ext_mult", 128 * 1024);   // 128 Kbytes !!!
+	//hf_spawn(mnist_ext_mult, 5, 4, 5, "mnist_ext_mult", 128 * 1024);   // 128 Kbytes !!!
+	hf_spawn(mnist_ext_vet_mult, 5, 4, 5, "mnist_ext_vet_mult", 128 * 1024);   // 128 Kbytes !!!	
 	//hf_spawn(int_mult, 5, 4, 5, "int_mult", 1024);   //10%
 	//hf_spawn(float_mult, 5, 4, 5, "float_mult", 1024);   //10%
 	//hf_spawn(cpp_mult, 5, 4, 5, "cpp_mult", 1024);   //10%
