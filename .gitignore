@@ -1,0 +1,47 @@
+#generated libraries and object files
+*.a
+*.o
+
+#simulation logs
+*.log
+
+#executable code and application binaries 
+*.bin
+*.exe
+
+#tool-sṕecific buulshit
+.clang
+.codelite
+.vscode*
+compile_*
+
+#perf and valgrind logs
+ursa.*
+perf.*
+
+#catkin generated files
+tools/ros-integration/.catkin_workspace
+tools/ros-integration/.catkin_tools
+tools/ros-integration/build/
+tools/ros-integration/devel/
+tools/ros-integration/logs/
+
+
+#compilation intermediate files
+#please note that files from software
+#folder may eventually be moved into
+#bin folder, so we may want to remove 
+#them from both folders before commiting
+*.cnt
+*.elf
+*.lst
+*.sec
+*.txt
+#software/hellfireos
+
+bin/*.cnt
+bin/*.elf
+bin/*.lst
+bin/*.sec
+bin/*.txt
+
