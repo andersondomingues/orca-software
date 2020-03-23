@@ -1,0 +1,17 @@
+# Do not modify the lines below
+APP_MNIST-EXT-MULT_NAME  := mnist-ext-mult
+APP_MNIST-EXT-MULT_DIR   := ./applications/$(APP_MNIST-EXT-MULT_NAME)
+APP_MNIST-EXT-MULT_SRC   := $(APP_MNIST-EXT-MULT_DIR)/src
+APP_MNIST-EXT-MULT_INC   := $(APP_MNIST-EXT-MULT_DIR)/include
+APP_MNIST-EXT-MULT_LIB   := app-$(APP_MNIST-EXT-MULT_NAME).a
+
+INC_DIRS += -I$(APP_MNIST-EXT-MULT_INC)
+
+CFLAGS += 
+
+# Update these lines with your source code
+APP_MNIST-EXT-MULT_SRCS := $(wildcard $(APP_MNIST-EXT-MULT_SRC)/*.c)
+APP_MNIST-EXT-MULT_OBJS :=  $(APP_MNIST-EXT-MULT_SRCS:.c=.o)
+
+$(APP_MNIST-EXT-MULT_LIB) : $(APP_MNIST-EXT-MULT_OBJS)
+	$(Q)$(AR) rcs $(APP_MNIST-EXT-MULT_LIB) $(APP_MNIST-EXT-MULT_OBJS) 

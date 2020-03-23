@@ -20,7 +20,7 @@ MAX_TASKS = 30
 MUTEX_TYPE = 0
 MEM_ALLOC = 3
 HEAP_SIZE = 500000
-FLOATING_POINT = 0
+FLOATING_POINT = 1
 #KERNEL_LOG = 2
 KERNEL_LOG = $(KERNEL_LOG_LEVEL)
 
@@ -47,10 +47,7 @@ $(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak)
 # common definition to all software modules
 INC_DIRS += -I $(HFOS_DIR)/lib/include \
 			-I $(HFOS_DIR)/sys/include \
-			-I $(HFOS_DIR)/drivers/noc/include \
-			-I $(HFOS_DIR)/../extensions/orca-core/include \
-			-I $(HFOS_DIR)/../extensions/orca-monitoring/include \
-			-I $(HFOS_DIR)/../extensions/orca-pubsub/include
+			-I $(HFOS_DIR)/drivers/noc/include 
 
 NOC_FLAGS = -DNOC_INTERCONNECT -DNOC_PACKET_SIZE=64 -DNOC_PACKET_SLOTS=64 \
 	    -DNOC_WIDTH=$(ORCA_NOC_WIDTH) -DNOC_HEIGHT=$(ORCA_NOC_HEIGHT)
@@ -79,6 +76,10 @@ $(OS_STATIC_LIBS):
 	$(Q)make kernel 
 	$(Q)$(AR) rcs hellfire-os.a *.o
 
+# general rule to compile all .c software
+.c.o:
+	$(Q)$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+
 ext: ext_banner $(EXT_STATIC_LIBS)
 
 ext_banner:
@@ -93,7 +94,7 @@ app_banner:
 	@echo "$'\e[7m  Making Applications ..          \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 
-$(IMAGE_NAME).bin: $(OS_STATIC_LIBS) ext app
+$(IMAGE_NAME).bin: $(OS_STATIC_LIBS) ext app ./Configuration.mk
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Linking Software ...            \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
@@ -114,7 +115,3 @@ clean:
 	$(Q)-find . -type f -name '*.o' -delete
 	$(Q)-find . -type f -name '*.a' -delete
 	$(Q)-find . -type f -name '$(IMAGE_NAME).*' -delete
-	
-
-
-
