@@ -25,15 +25,15 @@ CFLAGS = -Wall -march=rv32im -mabi=ilp32 -c -O2 -ffreestanding -nostdlib -ffixed
 LDFLAGS = -melf32lriscv $(LDFLAGS_STRIP)
 LINKER_SCRIPT = $(ARCH_DIR)/hf-riscv.ld
 
-CC = riscv32-unknown-elf-gcc
-CPP = riscv32-unknown-elf-g++
-AS = riscv32-unknown-elf-as
-AR = riscv32-unknown-elf-ar
-LD = riscv32-unknown-elf-ld
-DUMP = riscv32-unknown-elf-objdump -Mno-aliases
-READ = riscv32-unknown-elf-readelf
-OBJ = riscv32-unknown-elf-objcopy
-SIZE = riscv32-unknown-elf-size
+CC = riscv64-unknown-elf-gcc
+CPP = riscv64-unknown-elf-g++
+AS = riscv64-unknown-elf-as
+AR = riscv64-unknown-elf-ar
+LD = riscv64-unknown-elf-ld
+DUMP = riscv64-unknown-elf-objdump -Mno-aliases
+READ = riscv64-unknown-elf-readelf
+OBJ = riscv64-unknown-elf-objcopy
+SIZE = riscv64-unknown-elf-size
 
 hal:
 	$(Q)$(AS) $(ASFLAGS) -o crt0.o $(ARCH_DIR)/boot/crt0.s
