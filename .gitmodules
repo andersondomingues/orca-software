@@ -1,0 +1,3 @@
+[submodule "tools/linker-map-summary"]
+	path = tools/linker-map-summary
+	url = https://github.com/adafruit/linker-map-summary.git
