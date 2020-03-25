@@ -1,6 +1,8 @@
 #generated libraries and object files
 *.a
 *.o
+*.map
+*.s
 
 #simulation logs
 *.log
