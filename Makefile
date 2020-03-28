@@ -48,9 +48,6 @@ $(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak)
 INC_DIRS += -I $(HFOS_DIR)/lib/include \
 			-I $(HFOS_DIR)/sys/include \
 			-I $(HFOS_DIR)/drivers/noc/include \
-			-I $(HFOS_DIR)/../extensions/orca-core/include \
-			-I $(HFOS_DIR)/../extensions/orca-monitoring/include \
-			-I $(HFOS_DIR)/../extensions/orca-pubsub/include
 
 NOC_FLAGS = -DNOC_INTERCONNECT -DNOC_PACKET_SIZE=64 -DNOC_PACKET_SLOTS=64 \
 	    -DNOC_WIDTH=$(ORCA_NOC_WIDTH) -DNOC_HEIGHT=$(ORCA_NOC_HEIGHT)
@@ -78,6 +75,18 @@ $(OS_STATIC_LIBS):
 	$(Q)make noc
 	$(Q)make kernel 
 	$(Q)$(AR) rcs hellfire-os.a *.o
+
+# general rule to compile all .c software
+.c.o:
+	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
+
+# general rule to compile all .cpp software
+.cpp.o:
+	$(Q)$(CPP) -c $(CXXFLAGS) -o $@ $<
+
+# general rule to compile all .s software
+.s.o:
+	$(Q)$(AS) -c $(ASMFLAGS) -o $@ $<
 
 ext: ext_banner $(EXT_STATIC_LIBS)
 
@@ -114,7 +123,3 @@ clean:
 	$(Q)-find . -type f -name '*.o' -delete
 	$(Q)-find . -type f -name '*.a' -delete
 	$(Q)-find . -type f -name '$(IMAGE_NAME).*' -delete
-	
-
-
-
