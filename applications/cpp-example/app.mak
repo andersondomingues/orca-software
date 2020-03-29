@@ -8,7 +8,7 @@ APP_CPP_EXAMPLE_LIB   := app-$(APP_CPP_EXAMPLE_NAME).a
 INC_DIRS += -I$(APP_CPP_EXAMPLE_INC) -I/opt/gcc-riscv64/riscv-gcc-8.3.0-sifive/riscv64-unknown-elf/include/c++/8.3.0/
 
 CFLAGS += 
-CXXFLAGS += CFLAGS -lstdc++
+CXXFLAGS += CFLAGS -lstdc++ -std=c++11
 ASMFLAGS +=
 
 # Update these lines with your source code

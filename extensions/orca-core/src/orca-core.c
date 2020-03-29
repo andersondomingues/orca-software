@@ -29,7 +29,8 @@
 // #include "../../../applications/app-spawner/include/app-spawner.h"
 // #include "../../../applications/app-bloater/include/app-bloater.h"
 // #include "../../../applications/deadline-monitor/include/deadline-monitor.h"
-#include "../../../applications/cpp-example/include/cpp-example.h"
+//#include "../../../applications/cpp-example/include/cpp-example.h"
+#include "../../../applications/simple/include/simple.h"
 
 //Task mapping routine and entry-point. Please note that 
 //task mapping is done through software and the code below
@@ -39,8 +40,9 @@
 void app_main(void)
 {   
 
+	hf_spawn(simple, 5, 4, 5, "simple", 1024);   // 4/5%
 
-	hf_spawn(cpp_example, 5, 4, 5, "cpp_example", 1024);   // 4/5%
+	//hf_spawn(cpp_example, 5, 4, 5, "cpp_example", 1024);   // 4/5%
 /*
     //#ifdef CPU_ID == 22
 	//hfs

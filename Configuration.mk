@@ -14,25 +14,28 @@ GLOBAL_SETTINGS := -Wall -Wextra -Werror -g -std=c++17 -O3 -march=native -mtune=
 # be included in compilation unless you edit the file 
 #          extensions/orca-core/src/orca-core.cpp,
 # where you should set the spawn of tasks in each of the cores. 
-ORCA_APPLICATIONS := cpp-example
+ORCA_APPLICATIONS := simple
 
 # Software extensions (experimental)
-ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring
+#ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring
+ORCA_EXTENSIONS := orca-core orca-monitoring
 
-# ============================================================[ HELLFIREOS ]
-# Set level of logging for the HellfireOS kernel. 
-# 0 => disabled 
-# 1 => interruption and dispatch information (default)
-# 2 => same as level one plus calls to kernel functions
-KERNEL_LOG_LEVEL := 1
+# part of the software, like the device drivers, might know plataform-specific details to parametrize the software.
+# one example is the NoC driver and the orca-lib-client. Both of them require details about the Hw NoC, the size of the MpSoC, etc. 
+# PLATFORM := (orca-dma | single-core)
+PLATFORM := orca-dma
+
+# select among the supported OS
+#ORCA_OS := (bare-metal | hellfireos)
+ORCA_OS := hellfireos
 
 # ==================================================================[ ORCA ]
 # Width (x-axis coordinate) of the network-on-chip. Cannot be zero,
 # otherwise simulation won't compile.
-ORCA_NOC_HEIGHT := 3
+#ORCA_NOC_HEIGHT := 3
 # Width (y-axis coordinate) of the network-on-chip. Cannot be zero,
 # otherwise simulation won't compile.
-ORCA_NOC_WIDTH  := 2
+#ORCA_NOC_WIDTH  := 2
 
 # Number of cycles before calling the frequency analisys tool. Shorter
 # values may compromise the performance of the simulation, while higher
@@ -158,9 +161,9 @@ ifneq ($(ORCA_EPOCHS_TO_SIM), INF)
 endif
 
 COMPLINE := $(COMPLINE) \
-	-DORCA_NOC_HEIGHT=$(ORCA_NOC_HEIGHT) \
-	-DORCA_NOC_WIDTH=$(ORCA_NOC_WIDTH) \
 	-DORCA_EPOCH_LENGTH=$(ORCA_EPOCH_LENGTH)
+#	-DORCA_NOC_HEIGHT=$(ORCA_NOC_HEIGHT) \
+#	-DORCA_NOC_WIDTH=$(ORCA_NOC_WIDTH) \
 
 ifeq ($(ORCA_ENABLE_MULTITHREADING), YES)
 	COMPLINE := $(COMPLINE) -DORCA_ENABLE_MULTITHREADING
@@ -254,8 +257,8 @@ endif
 
 export COMPLINE
 export GLOBAL_SETTINGS
-export ORCA_NOC_HEIGHT
-export ORCA_NOC_WIDTH
+#export ORCA_NOC_HEIGHT
+#export ORCA_NOC_WIDTH
 export ORCA_APPLICATIONS
-export ORCA_EXTENSIONS
-export KERNEL_LOG_LEVEL
+#export ORCA_EXTENSIONS
+export ORCA_OS

@@ -8,33 +8,17 @@ export Q := @
 MAKEFLAGS += --no-print-directory
 endif
 
-#arch confs.
-ARCH = riscv/hf-riscv
+ORCA_SIM_DIR = ../orca-sim
+ORCA_SW_DIR = $(shell pwd)
+
 IMAGE_NAME = image
-
-#dir config.
-HFOS_DIR = hellfireos
-
-CPU_ARCH = \"$(ARCH)\"
-MAX_TASKS = 30
-MUTEX_TYPE = 0
-MEM_ALLOC = 3
-HEAP_SIZE = 500000
-FLOATING_POINT = 0
-#KERNEL_LOG = 2
-KERNEL_LOG = $(KERNEL_LOG_LEVEL)
-
-SRC_DIR = $(HFOS_DIR)
 
 # do not move this from here 
 all:  $(IMAGE_NAME).bin
 	@echo "done"
 
-#includes for kernel parts
-include $(HFOS_DIR)/arch/$(ARCH)/arch.mak
-include $(HFOS_DIR)/lib/lib.mak
-include $(HFOS_DIR)/drivers/noc.mak
-include $(HFOS_DIR)/sys/kernel.mak
+# get the OS depedent parameters. it also defines the OS_STATIC_LIB rule to compile the OS
+include ./os/$(ORCA_OS)/Configuration.mk
 
 #compile only the requested tasks 
 $(foreach module,$(ORCA_APPLICATIONS),$(eval include applications/$(module)/app.mak))
@@ -44,37 +28,14 @@ $(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak)
 #phonies
 .PHONY: clean
 
-# common definition to all software modules
-INC_DIRS += -I $(HFOS_DIR)/lib/include \
-			-I $(HFOS_DIR)/sys/include \
-			-I $(HFOS_DIR)/drivers/noc/include \
+# get the platform depedent parameters
+include $(ORCA_SIM_DIR)/platforms/$(PLATFORM)/Configuration.mk
 
-NOC_FLAGS = -DNOC_INTERCONNECT -DNOC_PACKET_SIZE=64 -DNOC_PACKET_SLOTS=64 \
-	    -DNOC_WIDTH=$(ORCA_NOC_WIDTH) -DNOC_HEIGHT=$(ORCA_NOC_HEIGHT)
-
-CFLAGS += -DCPU_ARCH=$(CPU_ARCH) \
-	-DMAX_TASKS=$(MAX_TASKS) -DMEM_ALLOC=$(MEM_ALLOC) \
-	-DHEAP_SIZE=$(HEAP_SIZE) -DMUTEX_TYPE=$(MUTEX_TYPE) \
-	-DFLOATING_POINT=$(FLOATING_POINT) \
-	-DKERNEL_LOG=$(KERNEL_LOG) \
-	$(COMPLINE) \
-	$(NOC_FLAGS)
-
-# concat the required libs to build the image 
+# concat the required libs and apps to build the image 
 $(foreach module,$(ORCA_APPLICATIONS), $(eval APP_STATIC_LIBS := $(APP_STATIC_LIBS) app-$(module).a))
 $(foreach module,$(ORCA_EXTENSIONS),   $(eval EXT_STATIC_LIBS := $(EXT_STATIC_LIBS) ext-$(module).a))
-OS_STATIC_LIBS := hellfire-os.a
-STATIC_LIBS := $(OS_STATIC_LIBS) $(APP_STATIC_LIBS) $(EXT_STATIC_LIBS)
+STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(EXT_STATIC_LIBS)
 
-$(OS_STATIC_LIBS):
-	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m  Making Kernel ...               \e[0m"
-	@echo "$'\e[7m==================================\e[0m"
-	$(Q)make hal
-	$(Q)make libc
-	$(Q)make noc
-	$(Q)make kernel 
-	$(Q)$(AR) rcs hellfire-os.a *.o
 
 # general rule to compile all .c software
 .c.o:
@@ -102,7 +63,7 @@ app_banner:
 	@echo "$'\e[7m  Making Applications ..          \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 
-$(IMAGE_NAME).bin: $(OS_STATIC_LIBS) ext app
+$(IMAGE_NAME).bin: $(OS_STATIC_LIB) ext app
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Linking Software ...            \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
