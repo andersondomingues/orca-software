@@ -22,13 +22,13 @@
 #define NUMBER_OF_INPUT_CELLS 784
 #define NUMBER_OF_OUTPUT_CELLS 10  
 
-#include "mnist-ext-vet-mult.h"
+#include "mnist-ext-vet-seq-mult.h"
 #include "orca-hardware-counters.h"
 
 // SIMD floating point multiplier, capable of up to 16 mult in 'parallel'
-#define MULT_RESULT		 ( uint32_t*)0xf0000120
-#define MULT_OP1		 ( uint32_t*)0xf0000160
-#define MULT_OP2		 ( uint32_t*)0xf0000200
+#define MULT_RESULT		 ( uint32_t*)0xf0000240
+#define MULT_OP1		 ( uint32_t*)0xf0000340
+#define MULT_OP2		 ( uint32_t*)0xf0000400
 //#define MULT_RESULT		 (volatile uint32_t*)0xf0000120
 //#define MULT_OP1		 (volatile uint32_t*)0xf0000160
 //#define MULT_OP2		 (volatile uint32_t*)0xf0000200
@@ -41,7 +41,7 @@ union Data {
    float f;
 } ; 
 
-void xuxu (int* op1){
+void verif (int* op1){
 	char sop1[20];
 	int i, aux;
 	float auxf;
@@ -52,9 +52,9 @@ void xuxu (int* op1){
 		auxf = (float)op1[i]; 
 		auxu.i = op1[i];
 		ftoa(auxf,sop1,4);
-		printf("xuxu test: %s %d \n",sop1,aux);
+		printf("verif: %s %d \n",sop1,aux);
 		ftoa(auxu.f,sop1,4);
-		printf("xuxu union test: %s \n",sop1);
+		printf("union verif: %s \n",sop1);
 	}
 }
 
@@ -64,7 +64,7 @@ void mult_vet( int* op1,  float* op2, float * out){
 	union Data  o1[SIMD_SIZE]; // aux input float
 	union Data  o2[SIMD_SIZE]; // aux weight float 
 	int i;
-	char sout[20], sop1[20], sop2[20];
+	//char sout[20], sop1[20], sop2[20];
 	//printf("entrei na mult\n");
 
 	for(i=0;i<SIMD_SIZE;i++){
@@ -101,9 +101,32 @@ void mult_vet( int* op1,  float* op2, float * out){
 	}
 	//printf("terminei a mult\n");
 	//hf_kill(hf_selfid()); 
-
 }
 
+void mult_vet2( const int* op1,  const float* op2, float * out){
+	int i;
+	int * s_op1, *t_op1;
+	int * s_op2, *t_op2;
+	int * s_res;
+	s_op1 = op1;
+	t_op1 = MULT_OP1;
+	s_op2 = op2; //(int *)op2 not required
+	t_op2 = MULT_OP2;
+	s_res = MULT_RESULT;
+
+	for(i=0;i<SIMD_SIZE;i++){
+		*t_op1 = *s_op1;  // write op1 into the ext mult
+		*t_op2 = *s_op2;  // write op2 into the ext mult
+		// get the result and accumulate
+		*out = *out + *((float *)s_res); // this cast is required
+		// inc the pointer to the next pos
+		t_op1++;
+		s_op1++;
+		t_op2++;
+		s_op2++;
+		s_res++;
+	}
+}
 
 // Layer = 784 i cells * 2 * 4 bytes * 10 o cells = +- 62Kbytes
 // image_vector  = 784 i cells  * 10 o cells * 4 bytes = +- 31Kbytes
@@ -150,14 +173,14 @@ void setCellOutput (Layer * l) {
 			// UNCOMMENT THE NEXT 4 LINES TO USE THE INTERNAL MULTIPLIER
 			//l->cell[i].output = l->cell[i].output + (l->cell[i].input[j] * l->cell[i].weight[j]);
 			//l->cell[i].output = l->cell[i].output + mult(l->cell[i].input[j] , l->cell[i].weight[j]);
-			mult_vet(&(l->cell[i].input[j]) , &(l->cell[i].weight[j]), &(l->cell[i].output));
+			mult_vet2(&(l->cell[i].input[j]) , &(l->cell[i].weight[j]), &(l->cell[i].output));
 			//xuxu(&(l->cell[i].input[j])); 
 		}
 		l->cell[i].output = l->cell[i].output / (float)NUMBER_OF_INPUT_CELLS;
 	}	
 }
 
-void mnist_ext_vet_mult (void) {
+void mnist_ext_vet_seq_mult (void) {
 
 	//printf("### STARTING! ###.\n"); 
 	
