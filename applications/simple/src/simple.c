@@ -18,9 +18,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 simple*/
  
 #include "simple.h"
+#include <stdio.h>
 
 //Task for printing values store by CPU counters. 
-void simple(void){
+int main(void){
 
 	printf("\n\n TESTING: %d + %d = %d",2,2,4);
 
@@ -36,6 +37,6 @@ void simple(void){
 	printf("CPU: hosttime=%u\n", *CPU_COUNTER_HOSTTIME);
 	printf("---\n");
 	
-	hf_kill(hf_selfid());
+	//hf_kill(hf_selfid());
 	//while(1);
 }

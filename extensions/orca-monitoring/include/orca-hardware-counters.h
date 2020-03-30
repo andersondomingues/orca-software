@@ -1,5 +1,6 @@
 #ifndef __ORCA_HARDWARE_COUNTERS_H
 #define __ORCA_HARDWARE_COUNTERS_H
+#include <stdint.h>
 
 //0x403F1xxx => memory mapped counters
 #ifdef MEMORY_ENABLE_COUNTERS

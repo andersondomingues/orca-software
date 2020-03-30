@@ -7,7 +7,7 @@ ORCA_MONITORING_LIB   := ext-$(ORCA_MONITORING_NAME).a
 
 INC_DIRS += -I$(ORCA_MONITORING_INC)
 
-CFLAGS += 
+CFLAGS += $(COMPLINE)
 
 # Update these lines with your source code
 ORCA_MONITORING_SRCS := $(wildcard $(ORCA_MONITORING_SRC)/*.c)

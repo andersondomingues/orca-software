@@ -21,16 +21,16 @@
 #include "orca-core.h"
 
 //task-specific headers
-// #include "../../../extensions/orca-pubsub/include/pubsub-broker.h"
+#include "../../../extensions/orca-pubsub/include/pubsub-broker.h"
 
-// #include "../../../applications/producer-consumer/include/producer-consumer.h"
-// #include "../../../applications/producer-consumer-pubsub/include/producer-consumer-pubsub.h"
+#include "../../../applications/producer-consumer/include/producer-consumer.h"
+#include "../../../applications/producer-consumer-pubsub/include/producer-consumer-pubsub.h"
 
-// #include "../../../applications/app-spawner/include/app-spawner.h"
-// #include "../../../applications/app-bloater/include/app-bloater.h"
-// #include "../../../applications/deadline-monitor/include/deadline-monitor.h"
+#include "../../../applications/app-spawner/include/app-spawner.h"
+#include "../../../applications/app-bloater/include/app-bloater.h"
+#include "../../../applications/deadline-monitor/include/deadline-monitor.h"
 //#include "../../../applications/cpp-example/include/cpp-example.h"
-#include "../../../applications/simple/include/simple.h"
+//#include "../../../applications/simple/include/simple.h"
 
 //Task mapping routine and entry-point. Please note that 
 //task mapping is done through software and the code below
@@ -40,10 +40,10 @@
 void app_main(void)
 {   
 
-	hf_spawn(simple, 5, 4, 5, "simple", 1024);   // 4/5%
+	//hf_spawn(simple, 5, 4, 5, "simple", 1024);   // 4/5%
 
 	//hf_spawn(cpp_example, 5, 4, 5, "cpp_example", 1024);   // 4/5%
-/*
+
     //#ifdef CPU_ID == 22
 	//hfs
 	//#elif CPU_ID == 32
@@ -81,7 +81,7 @@ void app_main(void)
 		default: // << NONE
 			break;
 	}
-*/	
+
 	//spawn for all cores
 	//hf_spawn(counter_test, 0, 0, 0, "counters_test", 4096);
 

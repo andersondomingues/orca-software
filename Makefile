@@ -28,8 +28,8 @@ $(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak)
 #phonies
 .PHONY: clean
 
-# get the platform depedent parameters
-include $(ORCA_SIM_DIR)/platforms/$(PLATFORM)/Configuration.mk
+# get the platform depedent parameters. 
+-include $(ORCA_SIM_DIR)/platforms/$(PLATFORM)/Configuration.mk
 
 # concat the required libs and apps to build the image 
 $(foreach module,$(ORCA_APPLICATIONS), $(eval APP_STATIC_LIBS := $(APP_STATIC_LIBS) app-$(module).a))

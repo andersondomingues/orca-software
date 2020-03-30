@@ -20,9 +20,9 @@
 #ifndef _SIMPLE_H
 #define _SIMPLE_H
 
-#include <hellfire.h>
+#include <hf-risc.h>
 #include "orca-hardware-counters.h"
 
-void simple(void); // __attribute__((section (".tasks")));
+//void simple(void); // __attribute__((section (".tasks")));
 
 #endif /* _SIMPLE_H */
