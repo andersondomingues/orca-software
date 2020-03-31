@@ -73,7 +73,7 @@ void mult_vet( int* op1,  float* op2, float * out){
 		//ftoa(op2[i],sop2,4); 
 		//printf("op1 %s op2 %s - %d \n",sop1,sop2,i);
 		//printf("op1 %x op2 %x \n",&(op1[i]),&(op2[i])); 
-		o1[i].f = (float)op1[i];
+		//o1[i].f = (float)op1[i];
 		o2[i].f = op2[i];
                 //printf("op1 %x <= %x \n",&(o1[i].f),&(op1[i])); 
 		//printf("op2 %x <= %x \n",&(o2[i].f),&(op2[i]));
@@ -213,11 +213,11 @@ void mnist_ext_vet_seq_mult (void) {
 	char so[20];
 
 	//Reading weights
-	//printf("reading weight ...\n");
+	printf("reading weight ...\n");
 	for (i = 0; i < NUMBER_OF_OUTPUT_CELLS; i++) {
 		setCellWeight(&mnist_l1.cell[i],weight_vector[i]);
 	}
-	//printf("weight read!\n");
+	printf("weight read!\n");
 	
 	//Reading input images
 	for (i = 0; i < NUMBER_OF_OUTPUT_CELLS; i++) {
