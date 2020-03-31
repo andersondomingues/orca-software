@@ -15,15 +15,25 @@ INC_DIRS += -I$(CURR_DIR)
 
 F_CLK=25000000
 
+## fin the lib dir inside the toolchain
+DIR_LIB_GCC=$(shell riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32 --print-file-name=libgcc.a)
+DIR_LIB_C=$(shell riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32 --print-file-name=libm.a)
+# get absolute path
+LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_GCC))))
+LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_C))))
+
+#LDFLAGS += -L/opt/gcc-riscv64/riscv-gcc-8.3.0-sifive/riscv64-unknown-elf/lib/rv32im/ilp32
+LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
+
 # this is stuff used everywhere - compiler and flags should be declared (ASFLAGS, CFLAGS, LDFLAGS, LINKER_SCRIPT, CC, AS, LD, DUMP, READ, OBJ and SIZE).
 # remember the kernel, as well as the application, will be compiled using the *same* compiler and flags!
 ASMFLAGS = -march=rv32im -mabi=ilp32 -fPIC
 CFLAGS = -Wall -march=rv32im -mabi=ilp32 -c -O2 -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 \
-		-fomit-frame-pointer -fdata-sections -ffunction-sections  $(INC_DIRS) \
-		-DCPU_SPEED=${F_CLK}
+		-fomit-frame-pointer -fdata-sections -ffunction-sections --specs=nosys.specs  \
+		-DCPU_SPEED=${F_CLK} $(INC_DIRS)
 #-nostdlib -mstrict-align  -DLITTLE_ENDIAN $(CFLAGS_STRIP) -DDEBUG_PORT
 
-LDFLAGS = -melf32lriscv -print-gc-sections 
+LDFLAGS = -melf32lriscv -print-gc-sections $(LIB_DIR) -lc_nano -lm -lc_nano -lgcc
 export LINKER_SCRIPT = $(CURR_DIR)/hf-risc.ld
 
 CC    = riscv64-unknown-elf-gcc
@@ -36,7 +46,7 @@ READ  = riscv64-unknown-elf-readelf
 OBJ   = riscv64-unknown-elf-objcopy
 SIZE  = riscv64-unknown-elf-size
 
-BARE_METAL_SRC = $(CURR_DIR)/crt0.s $(CURR_DIR)/interrupt.c
+BARE_METAL_SRC = $(CURR_DIR)/crt0.s $(CURR_DIR)/interrupt.c $(CURR_DIR)/syscalls_usart.c
 BARE_METAL_OBJS :=  $(BARE_METAL_SRC:.c=.o)
 BARE_METAL_OBJS +=  $(BARE_METAL_SRC:.s=.o)
 
