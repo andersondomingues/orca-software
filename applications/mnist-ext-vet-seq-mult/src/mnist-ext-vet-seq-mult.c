@@ -41,6 +41,7 @@ union Data {
    float f;
 } ; 
 
+/*
 void verif (int* op1){
 	char sop1[20];
 	int i, aux;
@@ -57,7 +58,7 @@ void verif (int* op1){
 		printf("union verif: %s \n",sop1);
 	}
 }
-
+*/
 // unefficient memory managment without DMA
 void mult_vet( int* op1,  float* op2, float * out){
 	union Data res;
