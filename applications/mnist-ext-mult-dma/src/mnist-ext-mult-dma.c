@@ -70,26 +70,29 @@ float SetDMA(uint32_t size, int* input_base_addr, float* weight_base_addr){
 	volatile uint32_t * dma_out = DMA_MAC_OUT;
 	volatile uint8_t * start = SIGNAL_DMA_PROG;
 	float out;
-	uint32_t start_cycles, end_cycles;
+	uint32_t start_cycles;
+	char str[20];
 
 	*burst_size = size;
 	*iaddr = input_base_addr; // op1
 	*waddr = weight_base_addr;// op2 
 
 	//printf("parameter DMA: cycles=%u, stalls=%u\n", *CPU_COUNTER_CYCLES_TOTAL, *CPU_COUNTER_CYCLES_STALL);	
-	start_cycles = *CPU_COUNTER_CYCLES_TOTAL;
-	*start = 3;
-	*start = 2;
-	printf("took: cycles=%u\n", *CPU_COUNTER_CYCLES_TOTAL - start_cycles);
+	//start_cycles = *CPU_COUNTER_CYCLES_TOTAL;
+	//*start = 3;
+	//*start = 2;
+	//printf("took: cpu cycles=%u - stall cycles=%u\n", *CPU_COUNTER_CYCLES_TOTAL - start_cycles, *CPU_COUNTER_CYCLES_STALL);
 	//printf("start DMA: cycles=%u, stalls=%u\n", *CPU_COUNTER_CYCLES_TOTAL, *CPU_COUNTER_CYCLES_STALL);	
 	start_cycles = *CPU_COUNTER_CYCLES_TOTAL;
 	*start = 1;
 	// then the processor goes into stall to perform the DMA ...
 	// when it wakes up again, the result can be read
 	//*start = 0;
-	printf("took: cycles=%u\n", *CPU_COUNTER_CYCLES_TOTAL - start_cycles);
 
 	out =  *((float *)dma_out); // this cast is required to convert to float
+	printf("took: cycles=%u - stall cycles=%u\n", *CPU_COUNTER_CYCLES_TOTAL - start_cycles, *CPU_COUNTER_CYCLES_STALL);
+	ftoa(out,str,6);
+	printf("result: %s - %p - %X\n", str,dma_out,DMA_MAC_OUT);
 	return out/(float)size;
 }
 

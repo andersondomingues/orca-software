@@ -64,6 +64,8 @@ SECTIONS
 		. = ALIGN(4);
 		_bss_end = . ;
 	} > ram
+	/* placing this symbol here to avoid erasing the NN memories*/
+	_end = .;
 
     /* placing my named section at given address: */
     /*https://mcuoneclipse.com/2012/11/01/defining-variables-at-absolute-addresses-with-gcc/*/
@@ -76,9 +78,6 @@ SECTIONS
     {
         KEEP(*(.input_mem)) /* keep my variable even if not referenced */
     } > ram
-
-	_end = .;
-	
 
 
 /*
