@@ -70,16 +70,26 @@ float SetDMA(uint32_t size, int* input_base_addr, float* weight_base_addr){
 	volatile uint32_t * dma_out = DMA_MAC_OUT;
 	volatile uint8_t * start = SIGNAL_DMA_PROG;
 	float out;
+	uint32_t start_cycles, end_cycles;
 
 	*burst_size = size;
 	*iaddr = input_base_addr; // op1
 	*waddr = weight_base_addr;// op2 
+
+	//printf("parameter DMA: cycles=%u, stalls=%u\n", *CPU_COUNTER_CYCLES_TOTAL, *CPU_COUNTER_CYCLES_STALL);	
+	start_cycles = *CPU_COUNTER_CYCLES_TOTAL;
+	*start = 3;
+	*start = 2;
+	printf("took: cycles=%u\n", *CPU_COUNTER_CYCLES_TOTAL - start_cycles);
+	//printf("start DMA: cycles=%u, stalls=%u\n", *CPU_COUNTER_CYCLES_TOTAL, *CPU_COUNTER_CYCLES_STALL);	
+	start_cycles = *CPU_COUNTER_CYCLES_TOTAL;
 	*start = 1;
 	// then the processor goes into stall to perform the DMA ...
 	// when it wakes up again, the result can be read
-	*start = 0;
-	out =  *((float *)dma_out); // this cast is required to convert to float
+	//*start = 0;
+	printf("took: cycles=%u\n", *CPU_COUNTER_CYCLES_TOTAL - start_cycles);
 
+	out =  *((float *)dma_out); // this cast is required to convert to float
 	return out/(float)size;
 }
 
@@ -142,8 +152,8 @@ void setCellOutput (Layer * l) {
 
 // place the MAC operands into their specific sections mapped into the NN memories
 // section attribute cannot be specified for local variables
-int op1[]  __attribute__((section (".input_mem")))   = {1,2,3} ;
-float op2[] __attribute__((section (".weight_mem"))) = {1.0,2.0,3.0} ;
+int op1[]  __attribute__((section (".input_mem")))   = {1,2,3,4,5,6,7,8,9,10} ;
+float op2[] __attribute__((section (".weight_mem"))) = {1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0} ;
 
 void mnist_ext_mult_dma (void) {
 
@@ -151,7 +161,7 @@ void mnist_ext_mult_dma (void) {
 	float result;
 	char str[20];
 
-	result = SetDMA(3,op1, op2);
+	result = SetDMA(10,op1, op2);
 	ftoa(result,str,6);
 	printf("RESULT: %s.\n",str); 
 
