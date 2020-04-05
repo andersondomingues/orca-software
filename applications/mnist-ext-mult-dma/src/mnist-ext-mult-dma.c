@@ -22,89 +22,22 @@
 #define NUMBER_OF_INPUT_CELLS 784
 #define NUMBER_OF_OUTPUT_CELLS 10  
 
-#include "mnist-ext-vet-seq-mult.h"
+#include "mnist-ext-mult-dma.h"
 #include "orca-hardware-counters.h"
 
 // SIMD floating point multiplier, capable of up to 16 mult in 'parallel'
-#define MULT_RESULT		 ( uint32_t*)0xf0000240
-#define MULT_OP1		 ( uint32_t*)0xf0000340
-#define MULT_OP2		 ( uint32_t*)0xf0000400
-//#define MULT_RESULT		 (volatile uint32_t*)0xf0000120
-//#define MULT_OP1		 (volatile uint32_t*)0xf0000160
-//#define MULT_OP2		 (volatile uint32_t*)0xf0000200
+#define SIGNAL_DMA_PROG     (volatile uint8_t*)0x40410002
 
-#define SIMD_SIZE 16
+// jumping to 0x404120xx, otherwise it wont fit before the memory counters
+#define DMA_BURST_SIZE       (volatile uint32_t*)0x40412000  // 32 bits 
+#define DMA_WEIGHT_MEM_ADDR  (volatile uint32_t*)0x40412004
+#define DMA_INPUT_MEM_ADDR   (volatile uint32_t*)0x40412008  
+#define DMA_MAC_OUT          (volatile uint32_t*)0x4041200C
 
-// union used to 'convert' float to int and int to float
-union Data {
-   int i;
-   float f;
-} ; 
+#define SIMD_SIZE 1
 
 /*
-void verif (int* op1){
-	char sop1[20];
-	int i, aux;
-	float auxf;
-	union Data auxu;
-
-	for(i=0;i<SIMD_SIZE;i++){ 
-		aux = op1[i];                                                                                                                                                                                          
-		auxf = (float)op1[i]; 
-		auxu.i = op1[i];
-		ftoa(auxf,sop1,4);
-		printf("verif: %s %d \n",sop1,aux);
-		ftoa(auxu.f,sop1,4);
-		printf("union verif: %s \n",sop1);
-	}
-}
-*/
-// unefficient memory managment without DMA
-void mult_vet( int* op1,  float* op2, float * out){
-	union Data res;
-	union Data  o1[SIMD_SIZE]; // aux input float
-	union Data  o2[SIMD_SIZE]; // aux weight float 
-	int i;
-	//char sout[20], sop1[20], sop2[20];
-	//printf("entrei na mult\n");
-
-	for(i=0;i<SIMD_SIZE;i++){
-		//printf("op2 %x <= %x \n",&(o2[i].f),&(op2[i]));
-		//ftoa(op1[i],sop1,4);                                                                                                                                                                                
-		//ftoa(op2[i],sop2,4); 
-		//printf("op1 %s op2 %s - %d \n",sop1,sop2,i);
-		//printf("op1 %x op2 %x \n",&(op1[i]),&(op2[i])); 
-		//o1[i].f = (float)op1[i];
-		o2[i].f = op2[i];
-                //printf("op1 %x <= %x \n",&(o1[i].f),&(op1[i])); 
-		//printf("op2 %x <= %x \n",&(o2[i].f),&(op2[i]));
-
-		//printf("convert\n");
-
-		//printf("op1-w %x <= %x \n",(MULT_OP1+i),&(o1[i].i));
-		*((volatile uint32_t*)(MULT_OP1+i)) = op1[i];
-		//printf("op2-w %x <= %x \n",(MULT_OP2+i),&(o2[i].i));
-		*((volatile uint32_t*)(MULT_OP2+i)) = o2[i].i;
-		//printf("wrote ops\n");
-
-		res.i = *(MULT_RESULT+i);
-		//printf("op1 %d op2 %d \n",o1[i].i,o2[i].i);
-		//printf("res %d \n",res.i);
-		//printf("got res\n");
-		//ftoa(o1[i].f,sop1,4);
-		//ftoa(o2[i].f,sop2,4);
-		//ftoa(res.f,sout,4);
-		//printf("mul %s x %s = %s\n",sop1,sop2,sout);
-
-		// accumulate the partial results
-		*out = *out + res.f;
-		//printf("out -> %d \n",*out);
-	}
-	//printf("terminei a mult\n");
-	//hf_kill(hf_selfid()); 
-}
-
-void mult_vet2( const int* op1,  const float* op2, float * out){
+void mult_vet( const int* op1,  const float* op2, float * out){
 	int i;
 	int * s_op1, *t_op1;
 	int * s_op2, *t_op2;
@@ -127,6 +60,27 @@ void mult_vet2( const int* op1,  const float* op2, float * out){
 		s_op2++;
 		s_res++;
 	}
+}
+*/
+
+float SetDMA(uint32_t size, int* input_base_addr, float* weight_base_addr){
+	volatile uint32_t * burst_size = DMA_BURST_SIZE;
+	volatile uint32_t * iaddr = DMA_INPUT_MEM_ADDR;
+	volatile uint32_t * waddr = DMA_WEIGHT_MEM_ADDR;
+	volatile uint32_t * dma_out = DMA_MAC_OUT;
+	volatile uint8_t * start = SIGNAL_DMA_PROG;
+	float out;
+
+	*burst_size = size;
+	*iaddr = input_base_addr; // op1
+	*waddr = weight_base_addr;// op2 
+	*start = 1;
+	// then the processor goes into stall to perform the DMA ...
+	// when it wakes up again, the result can be read
+	*start = 0;
+	out =  *((float *)dma_out); // this cast is required to convert to float
+
+	return out/(float)size;
 }
 
 // Layer = 784 i cells * 2 * 4 bytes * 10 o cells = +- 62Kbytes
@@ -167,23 +121,42 @@ void setCellWeight (Cell * c, float weight[]) {
 }
 
 void setCellOutput (Layer * l) {
-	int i,j;		
+	int i;
 	for (i = 0; i < NUMBER_OF_OUTPUT_CELLS; i++) {
 		l->cell[i].output = 0;
+		l->cell[i].output = SetDMA(NUMBER_OF_INPUT_CELLS,l->cell[i].input, l->cell[i].weight);
+		/*
 		for (j = 0; j < NUMBER_OF_INPUT_CELLS; j+=16) {
 			// UNCOMMENT THE NEXT 4 LINES TO USE THE INTERNAL MULTIPLIER
 			//l->cell[i].output = l->cell[i].output + (l->cell[i].input[j] * l->cell[i].weight[j]);
 			//l->cell[i].output = l->cell[i].output + mult(l->cell[i].input[j] , l->cell[i].weight[j]);
-			mult_vet2(&(l->cell[i].input[j]) , &(l->cell[i].weight[j]), &(l->cell[i].output));
+			mult_vet(&(l->cell[i].input[j]) , &(l->cell[i].weight[j]), &(l->cell[i].output));
 			//xuxu(&(l->cell[i].input[j])); 
+			
 		}
 		l->cell[i].output = l->cell[i].output / (float)NUMBER_OF_INPUT_CELLS;
+		*/
 	}	
 }
 
-void mnist_ext_vet_seq_mult (void) {
 
-	//printf("### STARTING! ###.\n"); 
+// place the MAC operands into their specific sections mapped into the NN memories
+// section attribute cannot be specified for local variables
+int op1[]  __attribute__((section (".input_mem")))   = {1,2,3} ;
+float op2[] __attribute__((section (".weight_mem"))) = {1.0,2.0,3.0} ;
+
+void mnist_ext_mult_dma (void) {
+
+	printf("### STARTING! ###.\n"); 
+	float result;
+	char str[20];
+
+	result = SetDMA(3,op1, op2);
+	ftoa(result,str,6);
+	printf("RESULT: %s.\n",str); 
+
+	printf("### FINISHED! ###.\n"); 
+	hf_kill(hf_selfid());
 	
 	Layer mnist_l1;
 	
@@ -211,7 +184,6 @@ void mnist_ext_vet_seq_mult (void) {
 
 	int i,j,idx;
 	float aux;
-	char so[20];
 
 	//Reading weights
 	printf("reading weight ...\n");
