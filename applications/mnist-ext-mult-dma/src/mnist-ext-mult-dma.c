@@ -70,6 +70,7 @@ float SetDMA(uint32_t size, int* input_base_addr, float* weight_base_addr){
 	volatile uint32_t * dma_out = DMA_MAC_OUT;
 	volatile uint8_t * start = SIGNAL_DMA_PROG;
 	float out;
+	uint32_t out_i;
 	uint32_t start_cycles;
 	char str[20];
 
@@ -89,10 +90,12 @@ float SetDMA(uint32_t size, int* input_base_addr, float* weight_base_addr){
 	// when it wakes up again, the result can be read
 	//*start = 0;
 
-	out =  *((float *)dma_out); // this cast is required to convert to float
+	out_i =  *dma_out; // this cast is required to convert to float
+	out = (float)out_i;
+	//out =  *((float *)dma_out); // this cast is required to convert to float
 	printf("took: cycles=%u - stall cycles=%u\n", *CPU_COUNTER_CYCLES_TOTAL - start_cycles, *CPU_COUNTER_CYCLES_STALL);
 	ftoa(out,str,6);
-	printf("result: %s - %p - %X\n", str,dma_out,DMA_MAC_OUT);
+	printf("result: %s - %d - 0x%X - 0x%X\n", str,out_i, dma_out,DMA_MAC_OUT);
 	return out/(float)size;
 }
 
