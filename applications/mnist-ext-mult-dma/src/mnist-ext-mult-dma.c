@@ -36,43 +36,16 @@
 
 #define SIMD_SIZE 1
 
-/*
-void mult_vet( const int* op1,  const float* op2, float * out){
-	int i;
-	int * s_op1, *t_op1;
-	int * s_op2, *t_op2;
-	int * s_res;
-	s_op1 = op1;
-	t_op1 = MULT_OP1;
-	s_op2 = op2; //(int *)op2 not required
-	t_op2 = MULT_OP2;
-	s_res = MULT_RESULT;
-
-	for(i=0;i<SIMD_SIZE;i++){
-		*t_op1 = *s_op1;  // write op1 into the ext mult
-		*t_op2 = *s_op2;  // write op2 into the ext mult
-		// get the result and accumulate
-		*out = *out + *((float *)s_res); // this cast is required
-		// inc the pointer to the next pos
-		t_op1++;
-		s_op1++;
-		t_op2++;
-		s_op2++;
-		s_res++;
-	}
-}
-*/
 
 float SetDMA(uint32_t size, int* input_base_addr, float* weight_base_addr){
 	volatile uint32_t * burst_size = DMA_BURST_SIZE;
 	volatile uint32_t * iaddr = DMA_INPUT_MEM_ADDR;
 	volatile uint32_t * waddr = DMA_WEIGHT_MEM_ADDR;
-	volatile uint32_t * dma_out = DMA_MAC_OUT;
+	volatile float * dma_out = DMA_MAC_OUT;
 	volatile uint8_t * start = SIGNAL_DMA_PROG;
 	float out;
-	uint32_t out_i;
 	uint32_t start_cycles,stall_cycles;
-	char str[20];
+	//char str[20];
 
 	*burst_size = size;
 	*iaddr = input_base_addr; // op1
@@ -84,11 +57,8 @@ float SetDMA(uint32_t size, int* input_base_addr, float* weight_base_addr){
 	*start = 1;
 	// then the processor goes into stall to perform the DMA ...
 	// when it wakes up again, the result can be read
-	//*start = 0;
 
-	out_i =  *dma_out; // this cast is required to convert to float
-	out = (float)out_i;
-	//out =  *((float *)dma_out); // this cast is required to convert to float
+	out =  *dma_out; // this cast is required to convert to float
 	// uncomment the following line to measure the # of instructions
 	printf("took: cycles=%u - stall cycles=%u\n", *CPU_COUNTER_CYCLES_TOTAL-start_cycles, *CPU_COUNTER_CYCLES_STALL-stall_cycles);
 	//ftoa(out,str,6);
@@ -214,7 +184,7 @@ void mnist_ext_mult_dma (void) {
 			
 		}
 		printf("Number %d identified!\n",idx);
-		hf_kill(hf_selfid());
+		//hf_kill(hf_selfid());
 	}
 
 	printf("MEM0: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
