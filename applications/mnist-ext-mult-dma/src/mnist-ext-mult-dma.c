@@ -45,14 +45,33 @@ float SetDMA(uint32_t size, int* input_base_addr, float* weight_base_addr){
 	volatile float * dma_out = DMA_MAC_OUT;
 	volatile uint8_t * start = SIGNAL_DMA_PROG;
 	volatile uint8_t * stall = SIGNAL_CPU_STALL;
-	float out;
+	volatile float out;
 	uint32_t start_cycles,stall_cycles;
-	char str[20];
+	char str[40];
+	int i, acc=0,icnt=0;
+	float accf=0.0f;
+	volatile uint32_t * iaddr_aux = iaddr;
+
 
 	*burst_size = size;
 	*iaddr = input_base_addr; // op1
 	*waddr = weight_base_addr;// op2 
-
+/*
+	for(i=0;i<NUMBER_OF_INPUT_CELLS;i++){
+		if (*iaddr_aux != 0 && *iaddr_aux != 1){
+			printf("input fudido (0x%d): %d !!!\n", iaddr_aux, *iaddr_aux); 
+		}
+		acc += *iaddr_aux;
+		if (*iaddr_aux == 1)
+			icnt++;
+		iaddr_aux++;
+	}
+	for(i=0;i<NUMBER_OF_INPUT_CELLS;i++){
+		accf += *waddr;
+	}	
+	ftoa(accf,str,6);
+	printf("OPs: %d - %d - %s\n", acc, icnt, accf);
+*/
 	// uncomment the following line to measure the # of instructions
 	//start_cycles = *CPU_COUNTER_CYCLES_TOTAL;
 	//stall_cycles = *CPU_COUNTER_CYCLES_STALL;
@@ -193,8 +212,8 @@ void mnist_ext_mult_dma (void) {
 			
 		}
 		printf("Number %d identified!\n",idx);
-		if (i==1)
-			hf_kill(hf_selfid());
+		//if (i==1)
+		//	hf_kill(hf_selfid());
 	}
 
 	printf("MEM0: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
