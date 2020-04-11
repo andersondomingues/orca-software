@@ -69,11 +69,13 @@ SECTIONS
 
     /* placing my named section at given address: */
     /*https://mcuoneclipse.com/2012/11/01/defining-variables-at-absolute-addresses-with-gcc/*/
+	/*2Mbytes for weights*/
     .weight_mem 0x40500000 :
     {
         KEEP(*(.weight_mem)) /* keep my variable even if not referenced */
     } > ram
  
+	/*2Mbytes for inputs*/
     .input_mem 0x40700000 :
     {
         KEEP(*(.input_mem)) /* keep my variable even if not referenced */
