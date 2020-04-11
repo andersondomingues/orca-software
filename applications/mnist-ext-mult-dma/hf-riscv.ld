@@ -74,7 +74,7 @@ SECTIONS
         KEEP(*(.weight_mem)) /* keep my variable even if not referenced */
     } > ram
  
-    .input_mem 0x40580000 :
+    .input_mem 0x40700000 :
     {
         KEEP(*(.input_mem)) /* keep my variable even if not referenced */
     } > ram
