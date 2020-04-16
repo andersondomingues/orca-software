@@ -15,7 +15,7 @@ GLOBAL_SETTINGS := -Wall -Wextra -Werror -g -std=c++17 -O3 -march=native -mtune=
 #          extensions/orca-core/src/orca-core.cpp,
 # where you should set the spawn of tasks in each of the cores. 
 #ORCA_APPLICATIONS := producer-consumer-pubsub producer-consumer app-spawner app-bloater deadline-monitor
-ORCA_APPLICATIONS := mnist-ext-mult-dma
+ORCA_APPLICATIONS := mnist-two-layers
 
 # Software extensions (experimental)
 #ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring
