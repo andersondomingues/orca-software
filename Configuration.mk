@@ -14,10 +14,12 @@ GLOBAL_SETTINGS := -Wall -Wextra -Werror -g -std=c++17 -O3 -march=native -mtune=
 # be included in compilation unless you edit the file 
 #          extensions/orca-core/src/orca-core.cpp,
 # where you should set the spawn of tasks in each of the cores. 
-ORCA_APPLICATIONS := producer-consumer-pubsub producer-consumer app-spawner app-bloater deadline-monitor
+#ORCA_APPLICATIONS := producer-consumer-pubsub producer-consumer app-spawner app-bloater deadline-monitor
+ORCA_APPLICATIONS := mnist-ext-mult-dma
 
 # Software extensions (experimental)
-ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring
+#ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring
+ORCA_EXTENSIONS := orca-core orca-monitoring
 
 # ============================================================[ HELLFIREOS ]
 # Set level of logging for the HellfireOS kernel. 
@@ -106,7 +108,7 @@ MEMORY_READ_ADDRESS_CHECKING := NO
 MEMORY_WIPE_ADDRESS_CHECKING := NO
 
 # Enable counter for read and write operations (depletes performance).
-MEMORY_ENABLE_COUNTERS := NO
+MEMORY_ENABLE_COUNTERS := YES
 
 # ==============================================================[ HFRISCV ]
 # Check whether address are mapped to some memory range before writing

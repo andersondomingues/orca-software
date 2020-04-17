@@ -1,5 +1,5 @@
 ustack:
-	$(CC) $(CFLAGS) \
+	$(Q)$(CC) $(CFLAGS) \
 		$(SRC_DIR)/net/ustack/arp.c \
 		$(SRC_DIR)/net/ustack/eth_netif.c \
 		$(SRC_DIR)/net/ustack/ip.c \
