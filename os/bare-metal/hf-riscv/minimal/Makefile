@@ -73,7 +73,7 @@ $(BUILD_DIR)/$(PROJECT).lst: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)
 	$(DUMP) -D $< > $@
 
 $(BUILD_DIR)/$(PROJECT).read: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)
-	$(READ) -S -l -s $< > $@
+	$(READ) -a $< > $@
 
 $(BUILD_DIR)/$(PROJECT).elf: $(OBJS)
 	@echo "Linking $@"
