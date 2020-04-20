@@ -1,5 +1,6 @@
 #source:  https://github.com/memfault/zero-to-main/tree/master/minimal
-PROJECT := minimal
+
+PROJECT := main
 BUILD_DIR ?= build
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
@@ -20,9 +21,21 @@ OBJ   = riscv64-unknown-elf-objcopy
 SIZE  = riscv64-unknown-elf-size
 MKDIR=mkdir
 
-# -Wl,--build-id
-# It's a sort of id fir the binary file. more info in
-# https://interrupt.memfault.com/blog/gnu-build-id-for-firmware
+## find the lib dir inside the toolchain
+DIR_LIB_GCC=$(shell $(CC) -march=rv32im -mabi=ilp32 --print-file-name=libgcc.a)
+DIR_LIB_C=$(shell   $(CC) -march=rv32im -mabi=ilp32 --print-file-name=libm.a)
+# get absolute path
+LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_GCC))))
+LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_C))))
+
+#LDFLAGS += -L/opt/gcc-riscv64/riscv-gcc-8.3.0-sifive/riscv64-unknown-elf/lib/rv32im/ilp32
+LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
+
+#
+# Uncomment for non-newlib libc
+#
+#CFLAGS += -nostdlib -DCUSTOM_LIBC
+#LDFLAGS += -L../lib/embeddedartistry_libc -lc
 
 CFLAGS += \
 	-march=rv32im -mabi=ilp32 \
@@ -41,10 +54,17 @@ LDFLAGS += \
 	-Wl,--gc-sections \
 	-Wl,--print-memory-usage \
 	-Wl,-Map=minimal.map \
-	-T riscv_minimal.ld
+	$(LIB_DIR) \
+	-lc_nano \
+	-DCUSTOM_LIBC \
+	-T riscv_newlib.ld
+
+INCLUDES = \
+	$(ASF_PATH)/sam0/drivers/sercom \
 
 
 SRCS = \
+	with-libc.c \
 	startup.c \
 	$(PROJECT).c
 

@@ -47,7 +47,8 @@ const DeviceVectors exception_table = {
         .pfnReset_Handler       = (void*) Reset_Handler,
         .pfnNMI_Handler         = (void*) NMI_Handler,
         .pfnHardFault_Handler   = (void*) HardFault_Handler,
-
+        .pvReservedM12          = (void*) (0UL), /* Reserved */
+        .pvReservedM11          = (void*) (0UL), /* Reserved */        
 };
 
 void NMI_Handler(void) {
