@@ -32,18 +32,14 @@ LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_C))))
 LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
 
 #
-# Uncomment for non-newlib libc
-#
-#CFLAGS += -nostdlib -DCUSTOM_LIBC
-#LDFLAGS += -L../lib/embeddedartistry_libc -lc
+#	-Wl,--build-id \
 
 CFLAGS += \
 	-march=rv32im -mabi=ilp32 \
 	-Wall \
-	-Wl,--build-id \
 	-std=c11 \
-	-O0 \
-	-g \
+	-O2 \
+	-Os \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
@@ -55,18 +51,17 @@ LDFLAGS += \
 	-Wl,--print-memory-usage \
 	-Wl,-Map=minimal.map \
 	$(LIB_DIR) \
-	-lc_nano \
-	-DCUSTOM_LIBC \
-	-T riscv_newlib.ld
+	-fno-math-errno \
+	-Wl,--start-group -lm -lc_nano -lgcc -Wl,--end-group \
+	-T hf-risc.ld
 
-INCLUDES = \
-	$(ASF_PATH)/sam0/drivers/sercom \
-
+INCLUDES = 
 
 SRCS = \
 	with-libc.c \
-	startup.c \
-	$(PROJECT).c
+	crt0.s \
+	libc_test.c
+# replace by libm_test.c to test libm
 
 OBJ_DIR = $(BUILD_DIR)/objs
 OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRCS))
@@ -87,6 +82,7 @@ $(OBJ_DIR)/%.o: %.c $(OBJ_DIR)
 
 $(BUILD_DIR)/$(PROJECT).bin: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)/$(PROJECT).lst $(BUILD_DIR)/$(PROJECT).read
 	$(OBJ) $< $@ -O binary
+	$(Q)hexdump -v -e '4/1 "%02x" "\n"' $(BUILD_DIR)/$(PROJECT).bin > $(BUILD_DIR)/$(PROJECT).txt
 	$(SIZE) $<
 
 $(BUILD_DIR)/$(PROJECT).lst: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)
@@ -101,4 +97,4 @@ $(BUILD_DIR)/$(PROJECT).elf: $(OBJS)
 
 clean:
 	@echo "Cleaning $<"
-	$(Q)rm -rf build logs *.map
+	$(Q)rm -rf build logs/*.log *.map

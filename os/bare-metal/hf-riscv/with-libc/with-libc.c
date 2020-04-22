@@ -1,22 +1,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/*
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-*/
-//#include <samd21g18a.h>
-//#include <port.h>
-//#include <usart_serial.h>
-
-//static struct usart_module stdio_uart_module;
-
 // hf-riscv debug addr
 #define DEBUG_ADDR	0xf00000d0
+#define EXIT_TRAP   0xe0000000
 volatile uint32_t* DEBUG = (volatile uint32_t*) DEBUG_ADDR;
+volatile uint32_t* EXIT = (volatile uint32_t*) EXIT_TRAP;
 
 // LIBC SYSCALLS
 /////////////////////
@@ -58,6 +47,7 @@ int _lseek(int file, int ptr, int dir) {
 
 void _exit(int status) {
 	/* Nothing to do */
+  * EXIT = 1;
 	for (;;);
 }
 
@@ -123,4 +113,19 @@ int _read (int file, char * ptr, int len) {
 }
 
 
+//////////////////////////////////////
+// c++ stubs to reduce memory usage
+//////////////////////////////////////
+/*
+void *operator new(size_t size) throw() { return malloc(size); }     
+void operator delete(void *p) throw() { free(p); }    
+extern "C" int __aeabi_atexit(void *object, void (*destructor)(void *), void *dso_handle){
+  return 0;
+} 
+*/
 
+//////////////////////////////////////
+// if the heap is not used
+//////////////////////////////////////
+//extern "C" void *malloc(size_t) {return (void *)0;}
+//extern "C" void free(void *) {  }
