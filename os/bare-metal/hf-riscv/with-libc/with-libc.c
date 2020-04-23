@@ -12,6 +12,9 @@ volatile uint32_t* EXIT = (volatile uint32_t*) EXIT_TRAP;
 
 extern uint32_t __heap_start;
 extern uint32_t __heap_end;
+extern uint32_t _sstack;
+extern uint32_t _estack;
+//extern uint32_t _stack;
 
 #ifdef _DEBUG
 // used only to debug syscalls
@@ -20,9 +23,17 @@ void uart_write(int8_t *s);
 #endif
 
 void *_sbrk(int incr) {
-  static unsigned char *heap = (unsigned char *)&__heap_start;
-  static unsigned char *eheap = (unsigned char *)&__heap_end;
+  static unsigned char *heap   = (unsigned char *)&__heap_start;
+  static unsigned char *eheap  = (unsigned char *)&__heap_end;
+  static unsigned char *sstack = (unsigned char *)&_sstack;
+  static unsigned char *estack = (unsigned char *)&_estack;
+  //static unsigned char *stack  = (unsigned char *)&_stack;
   unsigned char *prev_heap;
+
+  // get the current SP
+  void* sp = NULL;
+  //printf("%p", (void*)&p);
+  //register void *sp asm ("sp");
 
 #ifdef _DEBUG
   char numstr[20];
@@ -30,6 +41,7 @@ void *_sbrk(int incr) {
   char space[] = " - ";
   char alloc_str[] = "sbrk: ";
   char error_msg[] = "ERROR (sbrk): cannot alloc";
+  char error_mem_size_msg[] = "ERROR (sbrk): possible heap and stack overlap";
 
   uart_write(alloc_str);
   itoa((uint32_t)heap,numstr,16);
@@ -38,13 +50,34 @@ void *_sbrk(int incr) {
   itoa((uint32_t)(heap+incr),numstr,16);
   uart_write(numstr);
   uart_write(space);
+  itoa((uint32_t)(&sp),numstr,16);
+  uart_write(numstr);
+  uart_write(space);
   itoa((uint32_t)eheap,numstr,16);
   uart_write(numstr);
   uart_write(space);
   itoa((uint32_t)incr,numstr,10);
   uart_write(numstr);
   uart_write(newline);
+
+  // if the stack or the heap are too big, then these variables will overlap
+  if(eheap > sstack){
+    uart_write(error_mem_size_msg);
+    uart_write(newline);
+    _exit();
+  }
+
+  // check whether the SP is invading the heap area
+  if(eheap > &sp){
+    uart_write(error_mem_size_msg);
+    uart_write(newline);
+    _exit();
+  }
+
 #endif
+
+
+
 
   if ((heap + incr) >=  eheap) {
 #ifdef _DEBUG
