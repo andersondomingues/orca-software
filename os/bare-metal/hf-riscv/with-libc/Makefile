@@ -34,12 +34,15 @@ LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
 #
 #	-Wl,--build-id \
 
+# use -DHEAP_SIZE and -DSTACK_SIZE to chage the memory size
+
 CFLAGS += \
 	-march=rv32im -mabi=ilp32 \
 	-Wall \
 	-std=c11 \
 	-O2 \
 	-Os \
+	-D_DEBUG \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
@@ -60,8 +63,9 @@ INCLUDES =
 SRCS = \
 	with-libc.c \
 	crt0.s \
-	libc_test.c
+	malloc_test.c
 # replace by libm_test.c to test libm
+# replace by libc_test.c to test libc_nano
 
 OBJ_DIR = $(BUILD_DIR)/objs
 OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRCS))

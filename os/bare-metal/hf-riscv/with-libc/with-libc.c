@@ -10,20 +10,55 @@ volatile uint32_t* EXIT = (volatile uint32_t*) EXIT_TRAP;
 // LIBC SYSCALLS
 /////////////////////
 
-extern int _end;
+extern uint32_t __heap_start;
+extern uint32_t __heap_end;
+
+#ifdef _DEBUG
+// used only to debug syscalls
+int8_t *itoa_syscal(int32_t i, int8_t *s, int32_t base);
+void uart_write(int8_t *s);
+#endif
 
 void *_sbrk(int incr) {
-  static unsigned char *heap = NULL;
+  static unsigned char *heap = (unsigned char *)&__heap_start;
+  static unsigned char *eheap = (unsigned char *)&__heap_end;
   unsigned char *prev_heap;
 
-  if (heap == NULL) {
-    heap = (unsigned char *)&_end;
-  }
-  prev_heap = heap;
+#ifdef _DEBUG
+  char numstr[20];
+  char newline[] = "\n";
+  char space[] = " - ";
+  char alloc_str[] = "sbrk: ";
+  char error_msg[] = "ERROR (sbrk): cannot alloc";
 
+  uart_write(alloc_str);
+  itoa((uint32_t)heap,numstr,16);
+  uart_write(numstr);
+  uart_write(space);
+  itoa((uint32_t)(heap+incr),numstr,16);
+  uart_write(numstr);
+  uart_write(space);
+  itoa((uint32_t)eheap,numstr,16);
+  uart_write(numstr);
+  uart_write(space);
+  itoa((uint32_t)incr,numstr,10);
+  uart_write(numstr);
+  uart_write(newline);
+#endif
+
+  if ((heap + incr) >=  eheap) {
+#ifdef _DEBUG
+    uart_write(error_msg);
+    uart_write(newline);
+    _exit();
+#endif
+    return (unsigned char *)-1;
+  }
+
+  prev_heap = heap;
   heap += incr;
 
-  return prev_heap;
+  return (void *)prev_heap;
 }
 
 int _close(int file) {
@@ -129,3 +164,54 @@ extern "C" int __aeabi_atexit(void *object, void (*destructor)(void *), void *ds
 //////////////////////////////////////
 //extern "C" void *malloc(size_t) {return (void *)0;}
 //extern "C" void free(void *) {  }
+
+#ifdef _DEBUG
+// used only to debug syscalls
+int8_t *itoa_syscall(int32_t i, int8_t *s, int32_t base){
+	int8_t *ptr = s, *ptr1 = s, tmp_char;
+	int32_t tmp_value;
+
+	if (base < 2 || base > 36) {
+		*s = '\0';
+		return s;
+	}
+	do {
+		tmp_value = i;
+		i /= base;
+		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - i * base)];
+	} while (i);
+	if (tmp_value < 0)
+		*ptr++ = '-';
+	*ptr-- = '\0';
+	while(ptr1 < ptr) {
+		tmp_char = *ptr;
+		*ptr--= *ptr1;
+		*ptr1++ = tmp_char;
+	}
+	return s;
+}
+#endif
+
+
+#ifdef _DEBUG
+// rudimentary printf to debug system calls
+void uart_write(int8_t *s){
+  int8_t *ptr = s;
+  int32_t i=0;
+  char error_msg[] = "ERROR: cstr has no \\0\n";
+
+  while (*ptr != '\0')
+  {
+    *DEBUG = *ptr;
+    ptr++;
+    i++;
+    // check for strings without \0 
+    if (i>100) {
+      uart_write(error_msg);
+    }
+  }	
+#endif
+
+
+}
+

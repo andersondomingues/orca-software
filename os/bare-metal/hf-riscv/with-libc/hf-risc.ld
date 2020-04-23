@@ -15,6 +15,12 @@ hws		: ORIGIN = 0x40410000, LENGTH = 256B  /* mmio */
 }
 
 _stack = 0x40400000;
+STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x2000;
+
+/*4K bytes of heap by default. if using newlib, it is recommended to use at least 2Kbytes*/
+HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0x1000;
+
+
 
 SECTIONS
 {
@@ -60,5 +66,24 @@ SECTIONS
 	} > ram
 
 	_end = .;
+
+
+    /* stack section */
+/*
+    .stack (NOLOAD):
+    {
+        . = ALIGN(8);
+        _sstack = .;
+        . = . + STACK_SIZE;
+        . = ALIGN(8);
+        _estack = .;
+    } > ram
+*/
+    . = ALIGN(8);
+    __heap_start = .;
+	. = . + HEAP_SIZE;
+	__heap_end = .;
+
+
 }
 
