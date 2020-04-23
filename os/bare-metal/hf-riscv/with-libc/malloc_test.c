@@ -12,9 +12,13 @@ extern uint32_t __sstack;
 extern uint32_t __estack;
 extern uint32_t _stack;
 */
+void fun(int x) ;
+
+
 int main() {
   char * p,*p1,*p2;
   uint32_t size = 0;
+  int mat[1000][1000]; 
 
   printf("Testing Malloc and cia!!!\n");  
 
@@ -62,19 +66,22 @@ int main() {
   free(p);
   free(p1);
   free(p2);
-  p = calloc(1000,sizeof(char));
+  p = calloc(800,sizeof(char));
   printf("calloc p          0x%x\n", p); 
-  p1 = calloc(1000,sizeof(char));
+  p1 = calloc(800,sizeof(char));
   printf("calloc p1          0x%x\n", p1); 
   // if this is uncommented, it will cause alloc error
-  //p2 = calloc(1000,sizeof(char));
-  //printf("calloc p2          0x%x\n", p2); 
+  p2 = calloc(800,sizeof(char));
+  printf("calloc p2          0x%x\n", p2); 
+
+  // stack overflow by creating a non-terminating recursive function. 
+  //fun(5);
 
   printf("\nallocate until it craches ...\n\n");
   size = 2;
   while (1){
     p = realloc(p,sizeof(char)*size);
-    size += sizeof(char);
+    size += sizeof(char)*100;
     //printf("0x%x - %d bytes allocated\n", p, size);
 
     if (p == -1)
@@ -86,3 +93,16 @@ int main() {
 
   return 0;
 }
+
+
+void fun(int x) 
+{ 
+  // get the current SP
+  void* sp = NULL;
+  //printf("SP 0x%x \n", &sp);
+    if (x == 1) 
+       return; 
+    x = 6; 
+    fun(x); 
+} 
+  

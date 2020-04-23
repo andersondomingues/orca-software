@@ -1,7 +1,3 @@
-/*
-https://en.wikipedia.org/wiki/Data_segment
-https://embeddedgurus.com/state-space/2014/02/are-we-shooting-ourselves-in-the-foot-with-stack-overflow/
-*/
 
 ENTRY(_entry)
 
@@ -9,16 +5,14 @@ ENTRY(_entry)
 
 MEMORY
 {
-
-/*rom		: ORIGIN = 0x00000000, LENGTH = 1M	*/  /* ROM area*/
+rom		: ORIGIN = 0x00000000, LENGTH = 1M	  /* ROM area*/
 ram		: ORIGIN = 0x40000000, LENGTH = 4M	  /* RAM area. */
 hws		: ORIGIN = 0x40410000, LENGTH = 256B  /* mmio */ 
 }
 
-/*_stack = 0x40400000;*/
-/*_stacke = 0x00400000;*/
+/* the top of the stack is localted in the last position of the RAM, then it grows to the lower addrs*/
 __stacktop = ORIGIN(ram) + LENGTH(ram);
-
+/*8K bytes of heap by default.*/
 STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x2000;
 /*4K bytes of heap by default. if using newlib, it is recommended to use at least 2Kbytes*/
 HEAP_SIZE  = DEFINED(HEAP_SIZE)  ? HEAP_SIZE  : 0x1000;
@@ -83,13 +77,6 @@ SECTIONS
 	. = . + STACK_SIZE;
 	_estack = .;
 	_stack = .;
-
-/*
-		. = _stack;
-		. = . + STACK_SIZE;
-		_sstack = .;
-        _estack = .;
-*/
 
 }
 
