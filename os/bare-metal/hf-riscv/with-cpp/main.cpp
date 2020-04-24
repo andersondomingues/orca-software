@@ -1,6 +1,9 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include "test_class.h"
-
 
 TestClass global_class_with_static_item_0(5);
 TestClass global_class_with_static_item_1(2);
@@ -37,9 +40,7 @@ https://github.com/siemens/embb
 
 */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 class TestGlobalCtorDtor {
 public:  

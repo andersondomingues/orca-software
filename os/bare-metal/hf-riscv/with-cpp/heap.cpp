@@ -1,5 +1,10 @@
 
 // https://raw.githubusercontent.com/daedaleanai/libsupcxx/master/tests/test-03-heap.cc
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -75,3 +80,7 @@ void main(const char *cmdline) {
   printf("Cleared up the memory\n");
   delete [] large;
 }
+
+#ifdef __cplusplus
+}
+#endif
