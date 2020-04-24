@@ -180,6 +180,34 @@ int _read (int file, char * ptr, int len) {
 	return len;  
 }
 
+
+//////////////////////////////////////
+// c++ stubs to reduce memory usage
+//////////////////////////////////////
+
+void *operator new(size_t size) throw() { return malloc(size); }     
+void operator delete(void *p) throw() { free(p); }    
+extern "C" int __aeabi_atexit(void *object, void (*destructor)(void *), void *dso_handle){
+  return 0;
+} 
+
+
+void __aeabi_unwind_cpp_pr0(void)
+{
+}
+
+void __aeabi_unwind_cpp_pr1(void)
+{    
+}
+
+void __aeabi_atexit(void)
+{
+}
+
+void __dso_handle(void)
+{    
+}
+
 //////////////////////////////////////
 // if the heap is not used
 //////////////////////////////////////

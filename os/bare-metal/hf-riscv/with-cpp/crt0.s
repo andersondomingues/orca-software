@@ -1,6 +1,7 @@
 	.text
 	.align 2
 
+/*https://github.com/AzuKatze/STM32F4-cpp-freeRTOS/blob/master/startup/startup_stm32f427xx.s*/
 	.global RESET_handler
 	.global _entry
 _entry:
