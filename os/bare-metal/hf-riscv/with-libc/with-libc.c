@@ -19,7 +19,6 @@ extern uint32_t _estack;
 #ifdef _DEBUG
 // used only to debug syscalls
 int8_t *itoa_syscal(int32_t i, int8_t *s, int32_t base);
-void uart_write(int8_t *s);
 #endif
 
 void *_sbrk(int incr) {
@@ -62,8 +61,7 @@ void *_sbrk(int incr) {
 
   // if the stack or the heap are too big, then these variables will overlap
   if(eheap > sstack){
-    uart_write(error_mem_size_msg);
-    uart_write(newline);
+    _write (1, "ERROR (sbrk): possible heap and stack overlap\n", 46);
     _exit();
   }
 
@@ -129,7 +127,7 @@ int _getpid(void) {
 
 int _write (int file, char * ptr, int len) {
   /*
-  int written = 0;
+  int written = 0; 
 
   if ((file != 1) && (file != 2) && (file != 3)) {
     return -1;
@@ -211,26 +209,6 @@ int8_t *itoa_syscall(int32_t i, int8_t *s, int32_t base){
 	}
 	return s;
 }
-#endif
-
-
-#ifdef _DEBUG
-// rudimentary printf to debug system calls
-void uart_write(int8_t *s){
-  int8_t *ptr = s;
-  int32_t i=0;
-  char error_msg[] = "ERROR: cstr has no \\0\n";
-
-  while (*ptr != '\0')
-  {
-    *DEBUG = *ptr;
-    ptr++;
-    i++;
-    // check for strings without \0 
-    if (i>100) {
-      uart_write(error_msg);
-    }
-  }	
 #endif
 
 

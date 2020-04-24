@@ -18,12 +18,10 @@ extern uint32_t _sstack;
 extern uint32_t _estack;
 extern uint32_t _sbss;
 extern uint32_t _ebss;
-//extern uint32_t _stack;
 
 #ifdef _DEBUG
 // used only to debug syscalls
 int8_t *itoa_syscal(int32_t i, int8_t *s, int32_t base);
-void uart_write(int8_t *s);
 #endif
 
 void *_sbrk(int incr) {
@@ -31,65 +29,20 @@ void *_sbrk(int incr) {
   static unsigned char *eheap  = (unsigned char *)&__heap_end;
   static unsigned char *sstack = (unsigned char *)&_sstack;
   static unsigned char *estack = (unsigned char *)&_estack;
-  //static unsigned char *stack  = (unsigned char *)&_stack;
   unsigned char *prev_heap;
 
   // get the current SP
   void* sp = NULL;
-  //printf("%p", (void*)&p);
-  //register void *sp asm ("sp");
 
-#ifdef _DEBUG
-  char numstr[20];
-  char newline[] = "\n";
-  char space[] = " - ";
-  char alloc_str[] = "sbrk: ";
-  char error_msg[] = "ERROR (sbrk): cannot alloc";
-  char error_mem_size_msg[] = "ERROR (sbrk): possible heap and stack overlap";
-
-  uart_write(alloc_str);
-  itoa((uint32_t)heap,numstr,16);
-  uart_write(numstr);
-  uart_write(space);
-  itoa((uint32_t)(heap+incr),numstr,16);
-  uart_write(numstr);
-  uart_write(space);
-  itoa((uint32_t)(&sp),numstr,16);
-  uart_write(numstr);
-  uart_write(space);
-  itoa((uint32_t)eheap,numstr,16);
-  uart_write(numstr);
-  uart_write(space);
-  itoa((uint32_t)incr,numstr,10);
-  uart_write(numstr);
-  uart_write(newline);
-/*
-  // if the stack or the heap are too big, then these variables will overlap
-  // this chek is alredy in the linker script as an assertion
-  if(eheap > sstack){
-    uart_write(error_mem_size_msg);
-    uart_write(newline);
-    _exit();
-  }
-*/
   // check whether the SP is invading the heap area
   if(eheap > &sp){
-    uart_write(error_mem_size_msg);
-    uart_write(newline);
+    _write (1, "ERROR (sbrk): possible heap and stack overlap\n", 46);
     _exit();
   }
 
-#endif
-
-
-
-
   if ((heap + incr) >=  eheap) {
-#ifdef _DEBUG
-    uart_write(error_msg);
-    uart_write(newline);
+    _write (1, "ERROR (sbrk): cannot alloc\n", 27);
     _exit();
-#endif
     return (unsigned char *)-1;
   }
 
@@ -133,27 +86,11 @@ int _getpid(void) {
 }
 
 int _write (int file, char * ptr, int len) {
-  /*
-  int written = 0;
-
-  if ((file != 1) && (file != 2) && (file != 3)) {
-    return -1;
-  }
-
-  for (; len != 0; --len) {
-    if (usart_serial_putchar(&stdio_uart_module, (uint8_t)*ptr++)) {
-      return -1;
-    }
-    ++written;
-  }
-  return written;
-  */
   char *loc_ptr=ptr;
 
 	while (loc_ptr-ptr < len) 
 	{
 		*DEBUG = *loc_ptr;
-		//*((uint32_t *) 0xe1034000) = *loc_ptr;
 		loc_ptr++;
 	}	
 	
@@ -161,19 +98,6 @@ int _write (int file, char * ptr, int len) {
 }
 
 int _read (int file, char * ptr, int len) {
-  /*
-  int read = 0;
-
-  if (file != 0) {
-    return -1;
-  }
-
-  for (; len > 0; --len) {
-    usart_serial_getchar(&stdio_uart_module, (uint8_t *)ptr++);
-    read++;
-  }
-  return read;
-  */
   char *loc_ptr=ptr;
 
 	while (loc_ptr-ptr < len) 
@@ -276,27 +200,4 @@ int8_t *itoa_syscall(int32_t i, int8_t *s, int32_t base){
 	return s;
 }
 #endif
-
-
-#ifdef _DEBUG
-// rudimentary printf to debug system calls
-void uart_write(int8_t *s){
-  int8_t *ptr = s;
-  int32_t i=0;
-  char error_msg[] = "ERROR: cstr has no \\0\n";
-
-  while (*ptr != '\0')
-  {
-    *DEBUG = *ptr;
-    ptr++;
-    i++;
-    // check for strings without \0 
-    if (i>100) {
-      uart_write(error_msg);
-    }
-  }	
-#endif
-
-
-}
 
