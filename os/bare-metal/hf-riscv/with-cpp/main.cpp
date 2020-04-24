@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include "test_class.h"
 
-/*
+
 TestClass global_class_with_static_item_0(5);
 TestClass global_class_with_static_item_1(2);
 TestClass global_class_with_static_item_2(6);
-*/
+
 
 //https://github.com/daedaleanai/libsupcxx/blob/master/tests/test-03-heap.cc
 //https://github.com/daedaleanai/libsupcxx/blob/master/tests/test-01-initializers-operators.cc
@@ -42,12 +42,13 @@ extern "C" {
 #endif
 
 class TestGlobalCtorDtor {
-public:
-  TestGlobalCtorDtor() {
-    printf("Ctor called!\n");
-  }
+public:  
   ~TestGlobalCtorDtor() {
     printf("Dtor called!\n");
+  }
+
+  TestGlobalCtorDtor() {
+    printf("Ctor called!\n");
   }
 };
 
@@ -73,18 +74,21 @@ int main (){
   unsigned	preinit_array_size = (unsigned)&_preinit_array_size;
   unsigned	fini_array_size = (unsigned)&_fini_array_size;
 
+  // 'Ctor called' must be printed before the main
+
+  printf("main is starting ...\n");
   printf("Hello, Kernel World!\nAnd Hello Again!\n");
   printf("Memory sizes (bytes):\n-text: %d\n-data: %d\n-bss: %d\n-heap: %d\n-stack: %d\n-preinit: %d\n-init: %d\n-fini: %d\n",
     text_size,data_size,bss_size,heap_size,stack_size,preinit_array_size,init_array_size,fini_array_size);
-  printf("terminando ...\n");
+  
+  printf("class 1: %d\n",global_class_with_static_item_0.getI());
+  printf("class 2: %d\n",global_class_with_static_item_1.getI());
+  printf("class 3: %d\n",global_class_with_static_item_2.getI());
+  
 
-
-  /*
-  printf("%d %d %d\n",
-      global_class_with_static_item_0.getI(),
-      global_class_with_static_item_1.getI(),
-      global_class_with_static_item_2.getI());
-*/
+  printf("main is finishing ...\n");
+  
+  // 'Dtor called' must be printed after the last print of main
   return 0;
 }
 

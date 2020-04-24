@@ -1,16 +1,21 @@
-//https://github.com/daedaleanai/libsupcxx/blob/master/tests/test-01-initializers-operators.cc
+//source https://github.com/daedaleanai/libsupcxx/blob/master/tests/test-01-initializers-operators.cc
 #include <stdio.h>
-
 #include <initializer_list>
 
 class Matrix {
 private:
   __uint32_t matrix_[16];
 public:
+
+  ~Matrix() {
+    printf("mat dtor1\n");
+  }
+
   Matrix() {
     for(unsigned i = 0; i < 16; ++i) {
       matrix_[i] = 0;
     }
+    printf("mat ctor1\n");
   }
 
   Matrix(std::initializer_list<__uint32_t> init) {
@@ -18,12 +23,14 @@ public:
     for(auto &el : init) {
       matrix_[i++] = el;
     }
+    printf("mat ctor2\n");
   }
 
   Matrix(const Matrix &rhs) {
     for(unsigned i = 0; i < 15; ++i) {
       matrix_[i] = rhs.matrix_[i];
     }
+    printf("mat ctor3\n");
   }
   __uint32_t operator() (unsigned int i, unsigned int j) const {
     return matrix_[i*4+j];
@@ -65,9 +72,6 @@ Matrix operator + (const Matrix &lhs, const Matrix &rhs) {
 }
 
 
-
-
-
 void printMatrix(const Matrix &a) {
   for (size_t i = 0; i < 4; ++i) {
     for(size_t j = 0; j < 4; ++j) {
@@ -76,7 +80,6 @@ void printMatrix(const Matrix &a) {
     printf("\n");
   }
 }
-
 
 extern unsigned	_text_size;
 extern unsigned	_bss_size;
@@ -87,13 +90,12 @@ extern unsigned	_init_array_size;
 extern unsigned	_preinit_array_size;
 extern unsigned	_fini_array_size;
 
-  // Matrix d = {
-  //    1,  2,  3,  4,
-  //    5,  6,  7,  8,
-  //    9, 10, 11, 12,
-  //   13, 14, 15, 16
-  // };
-  //Matrix d;
+   Matrix d = {
+      1,  2,  3,  4,
+      5,  6,  7,  8,
+      9, 10, 11, 12,
+     13, 14, 15, 16
+   };
 
 int main() {
 
@@ -109,6 +111,9 @@ int main() {
   printf("Memory sizes (bytes):\n-text: %d\n-data: %d\n-bss: %d\n-heap: %d\n-stack: %d\n-preinit: %d\n-init: %d\n-fini: %d\n",
     text_size,data_size,bss_size,heap_size,stack_size,preinit_array_size,init_array_size,fini_array_size);
 
+  // it should be initialized before the main
+  printf("d \n");
+  printMatrix(d);
 
   Matrix a = {
      1,  2,  3,  4,
@@ -135,10 +140,6 @@ int main() {
   c = a + b;
   printf("a + b =\n");
   printMatrix(c);
-
-
-  //printf("d \n");
-  //printMatrix(d);
 
 return 0;
 

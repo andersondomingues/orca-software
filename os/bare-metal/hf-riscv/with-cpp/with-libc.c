@@ -63,14 +63,15 @@ void *_sbrk(int incr) {
   itoa((uint32_t)incr,numstr,10);
   uart_write(numstr);
   uart_write(newline);
-
+/*
   // if the stack or the heap are too big, then these variables will overlap
+  // this chek is alredy in the linker script as an assertion
   if(eheap > sstack){
     uart_write(error_mem_size_msg);
     uart_write(newline);
     _exit();
   }
-
+*/
   // check whether the SP is invading the heap area
   if(eheap > &sp){
     uart_write(error_mem_size_msg);

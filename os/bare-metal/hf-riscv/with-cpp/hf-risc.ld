@@ -30,21 +30,6 @@ SECTIONS
 /*https://github.com/JorgeAparicio/bareCortexM/blob/master/linker/stm32f100rb.ld*/
 /*https://github.com/zolkko/lpc2468-dh-example/blob/master/newlib-nano.ld*/
 
-		KEEP(*(.init))
-		KEEP(*(.fini))
-
-		*crtbegin.o(.ctors)
-		*crtbegin?.o(.ctors)
-		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
-		*(SORT(.ctors.*))
-		*(.ctors)
-
- 		*crtbegin.o(.dtors)
- 		*crtbegin?.o(.dtors)
- 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
- 		*(SORT(.dtors.*))
- 		*(.dtors)
-
 		_rodata = .;
 		*(.rdata)
 		*(.rodata)
@@ -57,16 +42,6 @@ SECTIONS
 
 
 	} > ram
-
-/*#if defined (CONFIG_CPLUSPLUS)*/
-    /*c++ init*/
-
-
-
-
-/*#endif*/
-
-
 
 	.data :
 	{ 

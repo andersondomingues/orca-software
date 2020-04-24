@@ -90,39 +90,30 @@ static INLINE void fill_heap(unsigned fill) {
 
 #ifdef CONFIG_CPLUSPLUS
 
-/** Call constructors for static objects
- */
 static INLINE void call_init_array() {
-    ptr_func_t array = __preinit_array_start;
+    ptr_func_t *array = __preinit_array_start;
 
-    printf("preinit: %p - %p\n",__preinit_array_start, __preinit_array_end);
     while (array < __preinit_array_end) {
         (*array)();
-        printf("preinit: %p\n",array);
         array++;
     }
 
     array = __init_array_start;
-    printf("init: %p - %p\n",__init_array_start, __init_array_end);
     while (array < __init_array_end) {
         (*array)();
         //printf("init: %p\n",array);
         array++;
     }
-    printf("fim call_init_array\n");
 }
 
 /** Call destructors for static objects
  */
 static INLINE void call_fini_array() {
-    ptr_func_t array = __fini_array_start;
-    printf("fini: %p - %p\n",__fini_array_start, __fini_array_end);
+    ptr_func_t *array = __fini_array_start;
     while (array < __fini_array_end) {
         (*array)();
-        printf("fini: %p\n",array);
         array++;
     }
-    printf("fim call_fini_array\n");
 }
 #endif
 

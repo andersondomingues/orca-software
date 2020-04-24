@@ -71,7 +71,7 @@ LDFLAGS += \
 	-Wl,-Map=minimal.map \
 	$(LIB_DIR) \
 	-fno-math-errno \
-	-Wl,--start-group -lm -lc_nano -lgcc -lstdc++ -Wl,--end-group \
+	-Wl,--start-group -lm -lc_nano -lgcc -lstdc++ -lnosys -Wl,--end-group \
 	-T hf-risc.ld
 
 
@@ -81,7 +81,7 @@ SRCS = \
 	with-libc.c \
 	crt0.s \
 	startup.c \
-	mat.cpp \
+	heap.cpp \
 	test_class.c
 # replace by libm_test.c to test libm
 # replace by libc_test.c to test libc_nano
