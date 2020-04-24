@@ -26,13 +26,9 @@ SECTIONS
 		_text = .;
 		*(.text)
 		*(.text.*)
-		_rodata = .;
-		*(.rdata)
-		*(.rodata)
-		*(.rodata.*)
-		_erodata = .;
 
 /*https://github.com/JorgeAparicio/bareCortexM/blob/master/linker/stm32f100rb.ld*/
+/*https://github.com/zolkko/lpc2468-dh-example/blob/master/newlib-nano.ld*/
 
 		KEEP(*(.init))
 		KEEP(*(.fini))
@@ -49,6 +45,11 @@ SECTIONS
  		*(SORT(.dtors.*))
  		*(.dtors)
 
+		_rodata = .;
+		*(.rdata)
+		*(.rodata)
+		*(.rodata.*)
+		_erodata = .;
 
 
     	_etext = .;
@@ -61,6 +62,22 @@ SECTIONS
     /*c++ init*/
 
 
+
+
+/*#endif*/
+
+
+
+	.data :
+	{ 
+		_data = .;
+		*(.data)
+		*(.data.*)
+		_gp = . + 0x800;
+		*(.sdata)
+		*(.sdata.*)
+		. = ALIGN(16);
+	} > ram
 
     .preinit_array ALIGN(4): {
         __preinit_array_start = .;
@@ -78,20 +95,7 @@ SECTIONS
         __fini_array_start = .;
         KEEP(*(.fini_array))
         __fini_array_end = .;
-/*#endif*/
-
     } >ram
-
-	.data :
-	{ 
-		_data = .;
-		*(.data)
-		*(.data.*)
-		_gp = . + 0x800;
-		*(.sdata)
-		*(.sdata.*)
-		. = ALIGN(16);
-	} > ram
 	_edata = .;
 
 	.bss :
@@ -128,6 +132,20 @@ SECTIONS
 /* include sizes
 https://github.com/PinusThunbergii/stm32/blob/master/linker-script/stm32f103c8t6.ld
 */
+
+	_text_size = SIZEOF(.text);
+	_bss_size = SIZEOF(.bss);
+	_heap_size = SIZEOF(.heap);
+	_stack_size = _estack - _sstack;
+	_data_size = SIZEOF(.data);
+	_init_array_size = SIZEOF(.init_array);
+	_preinit_array_size = SIZEOF(.preinit_array);
+	_fini_array_size = SIZEOF(.fini_array);
+
+
+	/* Check if data + heap + stack exceeds RAM limit */
+/*https://github.com/zolkko/lpc2468-dh-example/blob/master/newlib-nano.ld*/
+	ASSERT(_sstack > __heap_end, "region RAM overflowed with stack")
 
 }
 

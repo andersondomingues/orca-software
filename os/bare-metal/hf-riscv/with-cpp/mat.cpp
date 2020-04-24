@@ -5,7 +5,7 @@
 
 class Matrix {
 private:
-  double matrix_[16];
+  __uint32_t matrix_[16];
 public:
   Matrix() {
     for(unsigned i = 0; i < 16; ++i) {
@@ -13,18 +13,23 @@ public:
     }
   }
 
-  Matrix(std::initializer_list<double> init) {
+  Matrix(std::initializer_list<__uint32_t> init) {
     int i = 0;
     for(auto &el : init) {
       matrix_[i++] = el;
     }
   }
 
-  double operator() (unsigned int i, unsigned int j) const {
+  Matrix(const Matrix &rhs) {
+    for(unsigned i = 0; i < 15; ++i) {
+      matrix_[i] = rhs.matrix_[i];
+    }
+  }
+  __uint32_t operator() (unsigned int i, unsigned int j) const {
     return matrix_[i*4+j];
   }
 
-  double &operator() (unsigned int i, unsigned int j) {
+  __uint32_t &operator() (unsigned int i, unsigned int j) {
     return matrix_[i*4+j];
   }
 
@@ -33,12 +38,6 @@ public:
       matrix_[i] = rhs.matrix_[i];
     }
     return *this;
-  }
-
-  Matrix(const Matrix &rhs) {
-    for(unsigned i = 0; i < 15; ++i) {
-      matrix_[i] = rhs.matrix_[i];
-    }
   }
 };
 
@@ -55,16 +54,62 @@ Matrix operator * (const Matrix &lhs, const Matrix &rhs) {
   return m;
 }
 
+Matrix operator + (const Matrix &lhs, const Matrix &rhs) {
+  Matrix m;
+  for(unsigned i = 0; i < 4; ++i) {
+    for(unsigned j = 0; j < 4; ++j) {
+        m(i, j) = lhs(i, j) + rhs(i, j);
+    }
+  }
+  return m;
+}
+
+
+
+
+
 void printMatrix(const Matrix &a) {
   for (size_t i = 0; i < 4; ++i) {
     for(size_t j = 0; j < 4; ++j) {
-      printf("%f ", a(i, j));
+      printf("%d ", a(i, j));
     }
     printf("\n");
   }
 }
 
-void main(const char *cmdline) {
+
+extern unsigned	_text_size;
+extern unsigned	_bss_size;
+extern unsigned	_heap_size;
+extern unsigned	_stack_size;
+extern unsigned	_data_size;
+extern unsigned	_init_array_size;
+extern unsigned	_preinit_array_size;
+extern unsigned	_fini_array_size;
+
+  // Matrix d = {
+  //    1,  2,  3,  4,
+  //    5,  6,  7,  8,
+  //    9, 10, 11, 12,
+  //   13, 14, 15, 16
+  // };
+  //Matrix d;
+
+int main() {
+
+  unsigned	text_size = (unsigned)&_text_size;
+  unsigned	bss_size = (unsigned)&_bss_size;
+  unsigned	heap_size = (unsigned)&_heap_size;
+  unsigned	stack_size = (unsigned)&_stack_size;
+  unsigned	data_size = (unsigned)&_data_size;
+  unsigned	init_array_size = (unsigned)&_init_array_size;
+  unsigned	preinit_array_size = (unsigned)&_preinit_array_size;
+  unsigned	fini_array_size = (unsigned)&_fini_array_size;
+
+  printf("Memory sizes (bytes):\n-text: %d\n-data: %d\n-bss: %d\n-heap: %d\n-stack: %d\n-preinit: %d\n-init: %d\n-fini: %d\n",
+    text_size,data_size,bss_size,heap_size,stack_size,preinit_array_size,init_array_size,fini_array_size);
+
+
   Matrix a = {
      1,  2,  3,  4,
      5,  6,  7,  8,
@@ -86,4 +131,15 @@ void main(const char *cmdline) {
   Matrix c = a * b;
   printf("a * b =\n");
   printMatrix(c);
+
+  c = a + b;
+  printf("a + b =\n");
+  printMatrix(c);
+
+
+  //printf("d \n");
+  //printMatrix(d);
+
+return 0;
+
 }

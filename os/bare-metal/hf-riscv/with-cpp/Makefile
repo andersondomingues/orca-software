@@ -45,6 +45,7 @@ C_CPP_FLAGS += \
 	-O2 \
 	-Os \
 	-D_DEBUG \
+	-DCONFIG_CPLUSPLUS \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
@@ -61,7 +62,6 @@ CFLAGS += $(C_CPP_FLAGS) \
 CPPFLAGS += $(C_CPP_FLAGS) \
     -fno-exceptions \
 	-fno-unwind-tables \
-	-DCONFIG_CPLUSPLUS \
     -fno-rtti 
 
 LDFLAGS += \

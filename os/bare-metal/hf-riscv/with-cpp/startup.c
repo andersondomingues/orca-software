@@ -1,12 +1,33 @@
 // source : https://raw.githubusercontent.com/cortexm/baremetal/master/src/startup/startup.cpp
 // very simple startup code with definition of handlers for all cortex-m cores
 
+
+/*
+essa funcao c esse atributo nao usa stack. pode ser usada como startup code totalmente em c
+
+static inline __attribute__((always_inline)) int staticFunc(int a, int b) 
+{ 
+  return a+b;
+} 
+
+int main()
+{
+    int a = staticFunc(2,4);
+    return 0;
+}
+
+*/
+
 #ifndef __STARTUP_H__
 #define __STARTUP_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdio.h>
+
+#define INLINE inline __attribute__((always_inline))
 
 typedef void (*ptr_func_t)();
 
@@ -41,7 +62,7 @@ extern ptr_func_t __fini_array_end[];
 
 /** Copy default data to DATA section
  */
-void copy_data() {
+static INLINE void copy_data() {
     unsigned *src = &_text;
     unsigned *dst = &_data;
     while (dst < &_edata) {
@@ -51,7 +72,7 @@ void copy_data() {
 
 /** Erase BSS section
  */
-void zero_bss() {
+static INLINE void zero_bss() {
     unsigned *dst = &_sbss;
     while (dst < &_ebss) {
         *dst++ = 0;
@@ -60,7 +81,7 @@ void zero_bss() {
 
 /** Fill heap memory
  */
-void fill_heap(unsigned fill) {
+static INLINE void fill_heap(unsigned fill) {
     unsigned *dst = &__heap_start;
     while (dst < &__heap_end) {
         *dst++ = fill;
@@ -71,16 +92,21 @@ void fill_heap(unsigned fill) {
 
 /** Call constructors for static objects
  */
-void call_init_array() {
-    auto array = __preinit_array_start;
+static INLINE void call_init_array() {
+    ptr_func_t array = __preinit_array_start;
+
+    printf("preinit: %p - %p\n",__preinit_array_start, __preinit_array_end);
     while (array < __preinit_array_end) {
         (*array)();
+        printf("preinit: %p\n",array);
         array++;
     }
 
     array = __init_array_start;
+    printf("init: %p - %p\n",__init_array_start, __init_array_end);
     while (array < __init_array_end) {
         (*array)();
+        //printf("init: %p\n",array);
         array++;
     }
     printf("fim call_init_array\n");
@@ -88,12 +114,15 @@ void call_init_array() {
 
 /** Call destructors for static objects
  */
-void call_fini_array() {
-    auto array = __fini_array_start;
+static INLINE void call_fini_array() {
+    ptr_func_t array = __fini_array_start;
+    printf("fini: %p - %p\n",__fini_array_start, __fini_array_end);
     while (array < __fini_array_end) {
         (*array)();
+        printf("fini: %p\n",array);
         array++;
     }
+    printf("fim call_fini_array\n");
 }
 #endif
 
