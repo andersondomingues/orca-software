@@ -12,8 +12,12 @@ volatile uint32_t* EXIT = (volatile uint32_t*) EXIT_TRAP;
 
 extern uint32_t __heap_start;
 extern uint32_t __heap_end;
+extern uint32_t __data_start;
+extern uint32_t __data_end;
 extern uint32_t _sstack;
 extern uint32_t _estack;
+extern uint32_t _sbss;
+extern uint32_t _ebss;
 //extern uint32_t _stack;
 
 #ifdef _DEBUG
@@ -185,11 +189,8 @@ int _read (int file, char * ptr, int len) {
 // c++ stubs to reduce memory usage
 //////////////////////////////////////
 
-void *operator new(size_t size) throw() { return malloc(size); }     
-void operator delete(void *p) throw() { free(p); }    
-extern "C" int __aeabi_atexit(void *object, void (*destructor)(void *), void *dso_handle){
-  return 0;
-} 
+//void *operator new(size_t size) throw() { return malloc(size); }     
+//void operator delete(void *p) throw() { free(p); }    
 
 
 void __aeabi_unwind_cpp_pr0(void)
@@ -207,6 +208,40 @@ void __aeabi_atexit(void)
 void __dso_handle(void)
 {    
 }
+
+///https://github.com/arobenko/embxx_on_rpi/blob/master/src/stdlib/stdlib_stub.cpp
+/*
+// invoked using delete operator.
+void operator delete(void*)
+{
+    while (true) {}
+}
+
+// Compiler requires this function when there are pure virtual functions
+extern "C" void __cxa_pure_virtual()
+{
+    while (true) {}
+}
+
+// Compiler requires this function when there are static objects that
+// require custom destructors
+extern "C" int __aeabi_atexit(
+    void *object,
+    void (*destructor)(void *),
+    void *dso_handle)
+{
+    static_cast<void>(object);
+    static_cast<void>(destructor);
+    static_cast<void>(dso_handle);
+    return 0;
+}
+
+// Compiler requires this symbol when there are static objects that
+// require custom destructors
+void* __dso_handle = nullptr;
+
+*/
+
 
 //////////////////////////////////////
 // if the heap is not used

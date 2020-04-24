@@ -11,11 +11,12 @@ extern "C" {
 typedef void (*ptr_func_t)();
 
 // main application
-extern void main();
+extern int main();
 
 // location of these variables is defined in linker script
 extern unsigned _data;
 extern unsigned _edata;
+extern unsigned _text;
 
 extern unsigned _sbss;
 extern unsigned _ebss;
@@ -41,9 +42,9 @@ extern ptr_func_t __fini_array_end[];
 /** Copy default data to DATA section
  */
 void copy_data() {
-    unsigned *src = &__data_load;
-    unsigned *dst = &__data_start;
-    while (dst < &__data_end) {
+    unsigned *src = &_text;
+    unsigned *dst = &_data;
+    while (dst < &_edata) {
         *dst++ = *src++;
     }
 }
@@ -51,15 +52,15 @@ void copy_data() {
 /** Erase BSS section
  */
 void zero_bss() {
-    unsigned *dst = &__sbss;
-    while (dst < &__ebss) {
+    unsigned *dst = &_sbss;
+    while (dst < &_ebss) {
         *dst++ = 0;
     }
 }
 
 /** Fill heap memory
  */
-void fill_heap(unsigned fill=0x45455246) {
+void fill_heap(unsigned fill) {
     unsigned *dst = &__heap_start;
     while (dst < &__heap_end) {
         *dst++ = fill;
@@ -82,6 +83,7 @@ void call_init_array() {
         (*array)();
         array++;
     }
+    printf("fim call_init_array\n");
 }
 
 /** Call destructors for static objects
@@ -99,7 +101,7 @@ void call_fini_array() {
 void RESET_handler() {
     //copy_data();
     zero_bss();
-    //fill_heap();
+    //fill_heap(0x45455246);
 #ifdef CONFIG_CPLUSPLUS
     call_init_array();
 #endif

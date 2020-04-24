@@ -2,10 +2,17 @@
 OUTPUT_ARCH(arm)
 */
 
+ENTRY(Reset_Handler)
+
+
 MEMORY
 {
+    /*
   rom      (rx)  : ORIGIN = 0x00000000, LENGTH = 0x00040000
   ram      (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00008000
+  */
+    rom	 (rx)  : ORIGIN = 0x00000000, LENGTH = 256M	/* ROM area*/
+    ram	 (rwx) : ORIGIN = 0x40000000, LENGTH = 256M	/* RAM area. */  
 }
 
 STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : DEFINED(__stack_size__) ? __stack_size__ : 0x2000;
@@ -21,7 +28,7 @@ SECTIONS
         *(.text .text.*)
         *(.rodata .rodata*)
         . = ALIGN(4);
-    } > rom
+    } > ram
 
     . = ALIGN(4);
     _etext = .;

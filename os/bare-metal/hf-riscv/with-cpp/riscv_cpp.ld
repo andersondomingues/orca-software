@@ -41,11 +41,17 @@
  *
  */
 
+ENTRY(Reset_Handler)
+
 /* Memory Spaces Definitions */
 MEMORY
 {
+    /*
   rom      (rx)  : ORIGIN = 0x00000000, LENGTH = 0x00040000
   ram      (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00008000
+  */
+    rom	 (rx)  : ORIGIN = 0x00000000, LENGTH = 256M	/* ROM area*/
+    ram	 (rwx) : ORIGIN = 0x40000000, LENGTH = 256M	/* RAM area. */  
 }
 
 /* The stack size used by the application. NOTE: you need to adjust according to your application. */
@@ -54,12 +60,15 @@ STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x2000;
 /* Section Definitions */
 SECTIONS
 {
+    . = 0;
+
     .text :
     {
         . = ALIGN(4);
         _sfixed = .;
-        KEEP(*(.vectors .vectors.*))
+        *(.text.Reset_Handler)
         *(.text .text.* .gnu.linkonce.t.*)
+        KEEP(*(.vectors .vectors.*))
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
 
@@ -100,7 +109,7 @@ SECTIONS
 
         . = ALIGN(4);
         _efixed = .;            /* End of text section */
-    } > rom
+    } > ram
 
     . = ALIGN(4);
     _etext = .;
@@ -137,7 +146,7 @@ SECTIONS
         . = ALIGN(4);
         _edata = .;
     } > ram AT >rom
-    
+
     /* stack section */
     .stack (NOLOAD):
     {

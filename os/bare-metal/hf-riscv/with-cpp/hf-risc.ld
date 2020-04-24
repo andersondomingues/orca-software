@@ -31,11 +31,37 @@ SECTIONS
 		*(.rodata)
 		*(.rodata.*)
 		_erodata = .;
+
+/*https://github.com/JorgeAparicio/bareCortexM/blob/master/linker/stm32f100rb.ld*/
+
+		KEEP(*(.init))
+		KEEP(*(.fini))
+
+		*crtbegin.o(.ctors)
+		*crtbegin?.o(.ctors)
+		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+		*(SORT(.ctors.*))
+		*(.ctors)
+
+ 		*crtbegin.o(.dtors)
+ 		*crtbegin?.o(.dtors)
+ 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ 		*(SORT(.dtors.*))
+ 		*(.dtors)
+
+
+
     	_etext = .;
+
+
+
 	} > ram
 
-#ifdef CONFIG_CPLUSPLUS
+/*#if defined (CONFIG_CPLUSPLUS)*/
     /*c++ init*/
+
+
+
     .preinit_array ALIGN(4): {
         __preinit_array_start = .;
         KEEP(*(.preinit_array))
@@ -52,7 +78,7 @@ SECTIONS
         __fini_array_start = .;
         KEEP(*(.fini_array))
         __fini_array_end = .;
-#endif
+/*#endif*/
 
     } >ram
 

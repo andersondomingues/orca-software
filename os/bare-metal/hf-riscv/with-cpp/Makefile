@@ -37,25 +37,32 @@ LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
 # use -DHEAP_SIZE and -DSTACK_SIZE to chage the memory size
 # used -DCONFIG_CPLUSPLUS when using c++
 
-# c++ related flags
-#   -fno-exceptions
-#	-fno-unwind-tables, removes the .eh_frame section
-#   -fno-rtti \  
 
-CFLAGS += \
+# these are the flags that work for both C and C++
+C_CPP_FLAGS += \
 	-march=rv32im -mabi=ilp32 \
 	-Wall \
-	-std=c11 \
 	-O2 \
 	-Os \
 	-D_DEBUG \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
+	-nostdlib
+
+# these are the flags only for C
+CFLAGS += $(C_CPP_FLAGS) \
+	-std=c11 
+
+# c++ related flags
+#   -fno-exceptions
+#	-fno-unwind-tables, removes the .eh_frame section
+#   -fno-rtti \  
+CPPFLAGS += $(C_CPP_FLAGS) \
     -fno-exceptions \
 	-fno-unwind-tables \
-    -fno-rtti \
-	-nostdlib
+	-DCONFIG_CPLUSPLUS \
+    -fno-rtti 
 
 LDFLAGS += \
 	-specs=nano.specs \
@@ -64,17 +71,18 @@ LDFLAGS += \
 	-Wl,-Map=minimal.map \
 	$(LIB_DIR) \
 	-fno-math-errno \
-	-Wl,--start-group -lm -lc_nano -lgcc -Wl,--end-group \
+	-Wl,--start-group -lm -lc_nano -lgcc -lstdc++ -Wl,--end-group \
 	-T hf-risc.ld
 
 
-INCLUDES = 
+INCLUDES = .
 
 SRCS = \
 	with-libc.c \
 	crt0.s \
 	startup.c \
-	malloc_test.c
+	mat.cpp \
+	test_class.c
 # replace by libm_test.c to test libm
 # replace by libc_test.c to test libc_nano
 
@@ -94,6 +102,12 @@ $(OBJ_DIR)/%.o: %.c $(OBJ_DIR)
 	@echo "Compiling $<"
 	$(Q)$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) -c -o $@ $< $(CFLAGS)
+
+$(OBJ_DIR)/%.o: %.cpp $(OBJ_DIR)
+	@echo "Compiling $<"
+	$(Q)$(MKDIR) -p $(dir $@)
+	$(Q)$(CPP) -c -o $@ $< $(CPPFLAGS)
+
 
 $(BUILD_DIR)/$(PROJECT).bin: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)/$(PROJECT).lst $(BUILD_DIR)/$(PROJECT).read
 	$(OBJ) $< $@ -O binary
