@@ -8,15 +8,14 @@ testing the most common libm functions
 // defined in libc_nano
 //extern int __errno;
 
-int32_t ftoa(float f, int8_t *outbuf, int32_t precision);
-int8_t *itoa(int32_t i, int8_t *s, int32_t base);
+int32_t ftoa(float f, char *outbuf, int32_t precision);
+char *itoa(int32_t i, char *s, int32_t base);
 
 
 int main() {
-  int i, size;
   float af = 1.2f;
-  float bf = 2.1f,cf,df;
-  int ai = 1;
+  float bf = 2.1f,cf;
+  //int ai = 1;
   int bi = 2;
   double ad = 1.2, bd = 2.1, cd;
   
@@ -95,8 +94,8 @@ union float_long{
 	uint32_t u;
 };
 
-int8_t *itoa(int32_t i, int8_t *s, int32_t base){
-	int8_t *ptr = s, *ptr1 = s, tmp_char;
+char *itoa(int32_t i, char *s, int32_t base){
+	char *ptr = s, *ptr1 = s, tmp_char;
 	int32_t tmp_value;
 
 	if (base < 2 || base > 36) {
@@ -119,9 +118,9 @@ int8_t *itoa(int32_t i, int8_t *s, int32_t base){
 	return s;
 }
 
-int32_t ftoa(float f, int8_t *outbuf, int32_t precision){
+int32_t ftoa(float f, char *outbuf, int32_t precision){
 	int32_t mantissa, int_part, frac_part, exp2, i;
-	int8_t *p;
+	char *p;
 	union float_long fl;
 
 	p = outbuf;

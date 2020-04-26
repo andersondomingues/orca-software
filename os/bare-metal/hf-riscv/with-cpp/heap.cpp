@@ -10,6 +10,9 @@ extern "C" {
 
 class IInterface {
 public:
+  IInterface() {
+    printf("IInterface constructor called\n");
+  }
   virtual ~IInterface() {
     printf("IInterface destructor called\n");
   }
@@ -20,7 +23,8 @@ class Impl1: public IInterface {
 private:
   int a_;
 public:
-  Impl1(int a = 12) {
+  Impl1(int a = 12) : IInterface() {
+    printf("Impl1 constructor called\n");
     a_ = a;
   }
   virtual ~Impl1() {
@@ -33,6 +37,9 @@ public:
 
 class Impl2: public IInterface {
 public:
+  Impl2() : IInterface(){
+    printf("Impl2 constructor called\n");
+  }
   virtual ~Impl2() {
     printf("Impl2 destructor called\n");
   }

@@ -13,8 +13,6 @@ CURR_DIR = $(ORCA_SW_DIR)/os/$(ORCA_OS)
 
 INC_DIRS += -I$(CURR_DIR)
 
-F_CLK=25000000
-
 ## fin the lib dir inside the toolchain
 DIR_LIB_GCC=$(shell riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32 --print-file-name=libgcc.a)
 DIR_LIB_C=$(shell riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32 --print-file-name=libm.a)

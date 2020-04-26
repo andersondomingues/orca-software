@@ -38,10 +38,10 @@ int main() {
 #elif __have_longlong64
     printf("have long long\n");
 #endif
-printf("UINT32_MAX \t%d\n", UINT32_MAX);
-printf("INT32_MAX \t%d\n" , INT32_MAX);
-printf("UINT64_MAX \t%ld\n", UINT64_MAX);
-printf("INT64_MAX \t%ld\n" , INT64_MAX);
+printf("UINT32_MAX \t%ld\n", UINT32_MAX);
+printf("INT32_MAX \t%ld\n" , INT32_MAX);
+printf("UINT64_MAX \t%ld\n", (long)UINT64_MAX);
+printf("INT64_MAX \t%ld\n" , (long)INT64_MAX);
 
 printf("INT_MIN \t%d\n"   , INT_MIN);
 printf("INT_MAX \t%d\n"   , INT_MAX);
@@ -51,9 +51,9 @@ printf("LONG_MIN \t%ld\n"   , LONG_MIN);
 printf("LONG_MAX \t%ld\n"   , LONG_MAX);
 printf("ULONG_MAX \t%ld\n"  , ULONG_MAX);
 
-printf("LLONG_MIN \t%ld\n"   , LLONG_MIN);
-printf("LLONG_MAX \t%ld\n"   , LLONG_MAX);
-printf("ULLONG_MAX \t%ld\n"  , ULLONG_MAX);
+printf("LLONG_MIN \t%ld\n"   , (long)LLONG_MIN);
+printf("LLONG_MAX \t%ld\n"   , (long)LLONG_MAX);
+printf("ULLONG_MAX \t%ld\n"  , (long)ULLONG_MAX);
 
   return 0;
 }

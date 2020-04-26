@@ -1,11 +1,12 @@
 //source https://github.com/daedaleanai/libsupcxx/blob/master/tests/test-01-initializers-operators.cc
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdio.h>
 #include <initializer_list>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 class Matrix {
 private:

@@ -1,15 +1,32 @@
 
+/**
+ * @file
+ * @brief Linker script to specify HF-RISC memory areas, assuming bare metal apps
+ * 
+ * ROM is for an external flash with the code. currently not used bu required when porting it to FPGA.
+ *   .text
+ *   .rodata 
+ * RAM sections:
+ *   .data
+ *   .preinit <=== ?!?!?
+ *   .init    <== global classes constructors
+ *   .fini    <=== aparrently this is not been used. so the destructos of global classes are note called
+ *   .bss     <=== initialized local vars 
+ *   .heap    <=== for dynamic allocation
+ *   .stack   <=== global stack
+*/
+
 ENTRY(_entry)
 
-/* specify HF-RISC memory areas */
+/*  */
 
-/* if the flash size is not defined, the default is 1Mbyte*/
+/** if the flash size is not defined, the default is 1Mbyte*/
 FLASH_SIZE = DEFINED(FLASH_SIZE) ? FLASH_SIZE : 1M;
-/* by default, the flash starts at addr zero*/
+/** by default, the flash starts at addr zero*/
 FLASH_OFF = DEFINED(FLASH_OFF) ? FLASH_OFF : 0;
-/* if the ram size is not defined, the default is 4Mbyte*/
+/** if the ram size is not defined, the default is 4Mbyte*/
 RAM_SIZE = DEFINED(RAM_SIZE) ? RAM_SIZE : 4M;
-/* by default, the flash starts at addr 0x40000000*/
+/** by default, the flash starts at addr 0x40000000*/
 RAM_OFF = DEFINED(RAM_OFF) ? RAM_OFF : 0x40000000;
 
 MEMORY
@@ -18,11 +35,11 @@ rom		: ORIGIN = FLASH_OFF, LENGTH = FLASH_SIZE  /* ROM area*/
 ram		: ORIGIN = RAM_OFF,   LENGTH = RAM_SIZE	   /* RAM area. */
 }
 
-/* the top of the stack is localted in the last position of the RAM, then it grows to the lower addrs*/
+/** the top of the stack is localted in the last position of the RAM, then it grows to the lower addrs*/
 __stacktop = ORIGIN(ram) + LENGTH(ram);
-/*8K bytes of heap by default.*/
+/** 8K bytes of heap by default. configurable with a define*/
 STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x2000;
-/*4K bytes of heap by default. if using newlib, it is recommended to use at least 2Kbytes*/
+/** 4K bytes of heap by default. if using newlib, it is recommended to use at least 2Kbytes. configurable with a define*/
 HEAP_SIZE  = DEFINED(HEAP_SIZE)  ? HEAP_SIZE  : 0x1000;
 
 SECTIONS
@@ -131,4 +148,3 @@ SECTIONS
 	ASSERT(_sstack > __heap_end, "region RAM overflowed with stack")
 
 }
-

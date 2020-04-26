@@ -1,6 +1,10 @@
-// source : https://raw.githubusercontent.com/cortexm/baremetal/master/src/startup/startup.cpp
-// very simple startup code with definition of handlers for all cortex-m cores
 
+/**
+ * @file
+ * 
+ * @brief startup script with support to newlib nano and cpp
+ * 
+ */
 
 /*
 essa funcao c esse atributo nao usa stack. pode ser usada como startup code totalmente em c
@@ -62,6 +66,7 @@ extern ptr_func_t __fini_array_end[];
 
 /** Copy default data to DATA section
  */
+/*
 static INLINE void copy_data() {
     unsigned *src = &_text;
     unsigned *dst = &_data;
@@ -69,6 +74,7 @@ static INLINE void copy_data() {
         *dst++ = *src++;
     }
 }
+*/
 
 /** Erase BSS section
  */
@@ -81,12 +87,14 @@ static INLINE void zero_bss() {
 
 /** Fill heap memory
  */
+/*
 static INLINE void fill_heap(unsigned fill) {
     unsigned *dst = &__heap_start;
     while (dst < &__heap_end) {
         *dst++ = fill;
     }
 }
+*/
 
 #ifdef CONFIG_CPLUSPLUS
 
@@ -131,8 +139,6 @@ void RESET_handler() {
 #ifdef CONFIG_CPLUSPLUS
     call_fini_array();
 #endif    
-    // stop
-    //while (true);
 }
 
 #ifdef __cplusplus

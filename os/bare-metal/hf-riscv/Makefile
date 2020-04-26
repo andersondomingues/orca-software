@@ -1,6 +1,12 @@
 #source:  https://github.com/memfault/zero-to-main/tree/master/minimal
 
-PROJECT := main
+# replace MAIN_FILE by the name of the test app. 
+# $ make MAIN_FILE=<main code> all
+
+MAIN_FILE ?=with-cpp/main.cpp
+# extracts the 'main'
+#PROJECT = $(suffix $(basename $(MAIN_FILE)))
+PROJECT = main
 BUILD_DIR ?= build
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
@@ -35,18 +41,34 @@ LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
 #	-Wl,--build-id \
 
 # use -DHEAP_SIZE and -DSTACK_SIZE to chage the memory size
+# used -DCONFIG_CPLUSPLUS when using c++
 
-CFLAGS += \
+
+# these are the flags that work for both C and C++
+C_CPP_FLAGS += \
 	-march=rv32im -mabi=ilp32 \
 	-Wall \
-	-std=c11 \
 	-O2 \
 	-Os \
 	-D_DEBUG \
+	-DCONFIG_CPLUSPLUS \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
 	-nostdlib
+
+# these are the flags only for C
+CFLAGS += $(C_CPP_FLAGS) \
+	-std=c11 
+
+# c++ related flags
+#   -fno-exceptions
+#	-fno-unwind-tables, removes the .eh_frame section
+#   -fno-rtti \  
+CPPFLAGS += $(C_CPP_FLAGS) \
+    -fno-exceptions \
+	-fno-unwind-tables \
+    -fno-rtti 
 
 LDFLAGS += \
 	-specs=nano.specs \
@@ -55,17 +77,17 @@ LDFLAGS += \
 	-Wl,-Map=minimal.map \
 	$(LIB_DIR) \
 	-fno-math-errno \
-	-Wl,--start-group -lm -lc_nano -lgcc -Wl,--end-group \
+	-Wl,--start-group -lm -lc_nano -lgcc -lstdc++ -lnosys -Wl,--end-group \
 	-T hf-risc.ld
 
-INCLUDES = 
+
+INCLUDES = .
 
 SRCS = \
-	with-libc.c \
+	syscalls.c \
 	crt0.s \
-	malloc_test.c
-# replace by libm_test.c to test libm
-# replace by libc_test.c to test libc_nano
+	startup.c \
+	$(MAIN_FILE)
 
 OBJ_DIR = $(BUILD_DIR)/objs
 OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRCS))
@@ -84,6 +106,12 @@ $(OBJ_DIR)/%.o: %.c $(OBJ_DIR)
 	$(Q)$(MKDIR) -p $(dir $@)
 	$(Q)$(CC) -c -o $@ $< $(CFLAGS)
 
+$(OBJ_DIR)/%.o: %.cpp $(OBJ_DIR)
+	@echo "Compiling $<"
+	$(Q)$(MKDIR) -p $(dir $@)
+	$(Q)$(CPP) -c -o $@ $< $(CPPFLAGS)
+
+
 $(BUILD_DIR)/$(PROJECT).bin: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)/$(PROJECT).lst $(BUILD_DIR)/$(PROJECT).read
 	$(OBJ) $< $@ -O binary
 	$(Q)hexdump -v -e '4/1 "%02x" "\n"' $(BUILD_DIR)/$(PROJECT).bin > $(BUILD_DIR)/$(PROJECT).txt
@@ -97,7 +125,7 @@ $(BUILD_DIR)/$(PROJECT).read: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)
 
 $(BUILD_DIR)/$(PROJECT).elf: $(OBJS)
 	@echo "Linking $@"
-	$(Q)$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@	
+	$(Q)$(CPP) $(CPPFLAGS) $^ $(LDFLAGS) -o $@	
 
 clean:
 	@echo "Cleaning $<"

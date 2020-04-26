@@ -3,7 +3,50 @@ extern "C" {
 #endif
 
 #include <stdio.h>
-#include "test_class.h"
+//#include "test_class.h"
+
+
+// source: https://github.com/PinusThunbergii/stm32/blob/master/src/test_class.cpp
+
+class TestClass
+{
+public:
+    TestClass();
+    TestClass(int u);
+    ~TestClass();
+    void setI(int i){
+      this->i = i;
+    }
+    int getI(void){
+      return this->i;
+    }
+private:
+    int i;
+    static int s_i;
+protected:
+
+};
+
+TestClass::TestClass()
+{
+    i = 0xccddccdd;
+    printf("Ctor1 called!\n");
+}
+
+TestClass::TestClass(int u)
+{
+    i = u;
+    printf("Ctor2 called!\n");
+}
+
+TestClass::~TestClass()
+{
+    i = 0xdeadbeef;
+    printf("Dtor called!\n");
+}
+
+//int TestClass::s_i = 3;
+
 
 TestClass global_class_with_static_item_0(5);
 TestClass global_class_with_static_item_1(2);

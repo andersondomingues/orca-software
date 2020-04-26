@@ -22,34 +22,34 @@ int main() {
 
   printf("Testing Malloc and cia!!!\n");  
 
-  printf("heap start 0x%x\n", &__heap_start);  
-  printf("heap end   0x%x\n", &__heap_end);  
+  printf("heap start %p\n", &__heap_start);  
+  printf("heap end   %p\n", &__heap_end);  
 
   printf("p size      %d\n", sizeof(p));  
 
   p = (char *)malloc(sizeof(char));
   *p = 'a';
-  printf("alloc p          0x%x - %c\n", p, *p);  
+  printf("alloc p          %p - %c\n", p, *p);  
 
   p1 = (char *)malloc(sizeof(char));
   *p1 = 'b';
-  printf("alloc p1          0x%x - %c\n", p1, *p1);  
+  printf("alloc p1         %p - %c\n", p1, *p1);  
 
   p2 = (char *)malloc(sizeof(char));
   *p2 = 'c';
-  printf("alloc p2          0x%x - %c\n", p2, *p2);  
+  printf("alloc p2         %p - %c\n", p2, *p2);  
 
   free(p);
-  printf("free p          0x%x - %c\n", p, *p);  
+  printf("free p           %p - %c\n", p, *p);  
 
   p = (char *)malloc(sizeof(char));
   *p = 'd';
-  printf("alloc p          0x%x - %c\n", p, *p); 
+  printf("alloc p          %p - %c\n", p, *p); 
   free(p);
 
   printf("\ntesting realloc ...\n\n");
   int *ptr = (int *)malloc(sizeof(int)*2); 
-  int i; 
+  int i,j; 
   int *ptr_new; 
      
   *ptr = 10;  
@@ -67,12 +67,24 @@ int main() {
   free(p1);
   free(p2);
   p = calloc(800,sizeof(char));
-  printf("calloc p          0x%x\n", p); 
+  printf("calloc p          %p\n", p); 
   p1 = calloc(800,sizeof(char));
-  printf("calloc p1          0x%x\n", p1); 
+  printf("calloc p1         %p\n", p1); 
   // if this is uncommented, it will cause alloc error
   p2 = calloc(800,sizeof(char));
-  printf("calloc p2          0x%x\n", p2); 
+  printf("calloc p2         %p\n", p2); 
+
+  for(i=1;i<1000;i++)
+    for(j=1;j<1000;j++)
+      mat[i][j] = 1;
+
+  int sum=0;
+  for(i=1;i<1000;i++)
+    for(j=1;j<1000;j++)
+      sum += mat[i][j];
+
+  // TODO WTF ?!?!? the result is 998001 !?!?!
+  printf("\nexpeting 1000*1000 as result: %d\n",sum);
 
   // stack overflow by creating a non-terminating recursive function. 
   //fun(5);
@@ -84,7 +96,7 @@ int main() {
     size += sizeof(char)*100;
     //printf("0x%x - %d bytes allocated\n", p, size);
 
-    if (p == -1)
+    if ((int)p == -1)
         break;
   }
   // this message is not supposed to be printed

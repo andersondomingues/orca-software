@@ -24,25 +24,29 @@ extern uint32_t _ebss;
 int8_t *itoa_syscal(int32_t i, int8_t *s, int32_t base);
 #endif
 
+void _exit(int status);
+int _write (int file, char * ptr, int len);
+
+
 void *_sbrk(int incr) {
   static unsigned char *heap   = (unsigned char *)&__heap_start;
   static unsigned char *eheap  = (unsigned char *)&__heap_end;
-  static unsigned char *sstack = (unsigned char *)&_sstack;
-  static unsigned char *estack = (unsigned char *)&_estack;
+  //static unsigned char *sstack = (unsigned char *)&_sstack;
+  //static unsigned char *estack = (unsigned char *)&_estack;
   unsigned char *prev_heap;
 
   // get the current SP
   void* sp = NULL;
 
   // check whether the SP is invading the heap area
-  if(eheap > &sp){
+  if(eheap > (unsigned char *)&sp){
     _write (1, "ERROR (sbrk): possible heap and stack overlap\n", 46);
-    _exit();
+    _exit(0);
   }
 
   if ((heap + incr) >=  eheap) {
     _write (1, "ERROR (sbrk): cannot alloc\n", 27);
-    _exit();
+    _exit(0);
     return (unsigned char *)-1;
   }
 
@@ -113,11 +117,13 @@ int _read (int file, char * ptr, int len) {
 //////////////////////////////////////
 // c++ stubs to reduce memory usage
 //////////////////////////////////////
+// TODO mak emore tests. fi they passed, then these code bellow can be removed
+
 
 //void *operator new(size_t size) throw() { return malloc(size); }     
 //void operator delete(void *p) throw() { free(p); }    
 
-
+/*
 void __aeabi_unwind_cpp_pr0(void)
 {
 }
@@ -129,10 +135,11 @@ void __aeabi_unwind_cpp_pr1(void)
 void __aeabi_atexit(void)
 {
 }
-
+*/
 void __dso_handle(void)
 {    
 }
+
 
 ///https://github.com/arobenko/embxx_on_rpi/blob/master/src/stdlib/stdlib_stub.cpp
 /*
