@@ -13,7 +13,7 @@ GLOBAL_SETTINGS := -Wall -Wextra -Werror -g -std=c++17 -O3 -march=native -mtune=
 # use spacebar to separate names. Applications defined here will not 
 # be included in compilation unless you edit the file 
 #          extensions/orca-core/src/orca-core.cpp,
-# where you should set the spawn of tasks in each of the cores. 
+# where you should simple of tasks in each of the cores. 
 ORCA_APPLICATIONS := simple
 #ORCA_APPLICATIONS := producer-consumer-pubsub producer-consumer app-spawner app-bloater deadline-monitor
 
@@ -44,7 +44,7 @@ ORCA_OS := bare-metal/hf-riscv
 ORCA_EPOCH_LENGTH  := 10000000
 #ORCA_EPOCH_LENGTH  := 50000000
 
-# Number of pulses to simulate. Set to INF to simulate indefinitely.
+# Number of pulses to simulate. Set to INF to simulate indefinitely. 
 ORCA_EPOCHS_TO_SIM := INF
 #ORCA_EPOCHS_TO_SIM := 3
 

@@ -28,7 +28,7 @@ int32_t ftoa(float f, int8_t *outbuf, int32_t precision);
 int8_t *itoa(int32_t i, int8_t *s, int32_t base);
 
 //Task for printing values store by CPU counters. 
-int main(void){
+void libc_test(void){
 
     float a = 1.2;
     float b = 2.1;
@@ -70,6 +70,12 @@ int main(void){
 	
 }
 
+#ifdef BARE_METAL
+	void main(){
+		libc_test();
+	}
+#endif
+
 
 union float_long{
 	float f;
@@ -100,6 +106,7 @@ int8_t *itoa(int32_t i, int8_t *s, int32_t base){
 	}
 	return s;
 }
+
 
 int32_t ftoa(float f, int8_t *outbuf, int32_t precision){
 	int32_t mantissa, int_part, frac_part, exp2, i;

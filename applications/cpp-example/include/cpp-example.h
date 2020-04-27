@@ -20,9 +20,11 @@
 #ifndef _CPP_EXAMPLE_H
 #define _CPP_EXAMPLE_H
 
-#include <hellfire.h>
-//#include <stdio.h>
 #include <iostream>
+
+#ifdef HELLFIREOS
+#include <hellfire.h>
+#endif
 
 class ExampleBaseClass
 {

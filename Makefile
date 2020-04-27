@@ -13,7 +13,7 @@ ORCA_SW_DIR = $(shell pwd)
 
 IMAGE_NAME = image
 
-# do not move this from here 
+# do not move this from here  
 all:  $(IMAGE_NAME).bin
 	@echo "done"
 

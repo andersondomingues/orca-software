@@ -17,7 +17,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. */
  
-#include "counter-test.h"
+#include "cpp-example.h"
 #include "orca-hardware-counters.h"
 #include <vector>
 #include <algorithm>
@@ -39,12 +39,14 @@ void cpp_example(void){
 	obj->print_something_novirt();
 	delete obj;
 
+	std::cout << "C++ vector!" << std::endl;
 	std::vector<unsigned int> some_ints;
 	some_ints.push_back(0x48c9b3e4);
 	some_ints.push_back(0x79109b6a);
 	some_ints.push_back(0x16155039);
 	some_ints.push_back(0xa3635c9a);
 	some_ints.push_back(0x8d2f4702);
+/*	
 	some_ints.push_back(0x38d232ae);
 	some_ints.push_back(0x93924a17);
 	some_ints.push_back(0x62b895cc);
@@ -56,14 +58,13 @@ void cpp_example(void){
 	some_ints.push_back(0xe5a121ef);
 	some_ints.push_back(0xff00866d);
 	some_ints.push_back(0xb843b879);
-
+*/
 	std::sort(some_ints.begin(), some_ints.end());
 
 	for (auto n : some_ints)
 		std::cout << std::hex << n << std::endl;
 
 	std::cout << "All done." << std::endl;
-	return 0;
 
 	printf("MEM0: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
 	printf("MEM1: writes=%u, reads=%u\n", *M1_COUNTER_STORE, *M1_COUNTER_LOAD);
@@ -77,6 +78,13 @@ void cpp_example(void){
 	printf("CPU: hosttime=%u\n", *CPU_COUNTER_HOSTTIME);
 	printf("---\n");
 
-	hf_kill(hf_selfid());
-	//while(1);
+	#ifdef HELLFIREOS
+	 	hf_kill(hf_selfid());
+	#endif
 }
+
+#ifdef BARE_METAL
+	void main(){
+		cpp_example();
+	}
+#endif

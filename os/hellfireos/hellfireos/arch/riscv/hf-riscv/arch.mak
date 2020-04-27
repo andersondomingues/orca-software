@@ -19,7 +19,7 @@ LDFLAGS_STRIP = -print-gc-sections #--gc-sections
 ASFLAGS = -march=rv32im -mabi=ilp32 -fPIC
 CFLAGS = -Wall -march=rv32im -mabi=ilp32 -c -O2 -ffreestanding -nostdlib -ffixed-s10 -ffixed-s11 \
 		 -fomit-frame-pointer $(INC_DIRS) -DCPU_SPEED=${F_CLK} -DTIME_SLICE=${TIME_SLICE} \
-		 -DLITTLE_ENDIAN $(CFLAGS_STRIP) -DKERN_VER=\"$(KERNEL_VER)\" \
+		 -DLITTLE_ENDIAN $(CFLAGS_STRIP) -DKERN_VER=\"$(KERNEL_VER)\" \ -DHELLFIREOS
 		 #-DDEBUG_PORT #-mrvc -fPIC -DDEBUG_PORT -msoft-float -fshort-double
 		 
 LDFLAGS = -melf32lriscv $(LDFLAGS_STRIP)

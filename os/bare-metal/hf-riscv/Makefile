@@ -37,6 +37,8 @@ LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_C))))
 #LDFLAGS += -L/opt/gcc-riscv64/riscv-gcc-8.3.0-sifive/riscv64-unknown-elf/lib/rv32im/ilp32
 LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
 
+INC_DIRS += -I.
+
 #
 #	-Wl,--build-id \
 
@@ -55,7 +57,8 @@ C_CPP_FLAGS += \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
-	-nostdlib
+	-nostdlib \
+	$(INC_DIRS)
 
 # these are the flags only for C
 CFLAGS += $(C_CPP_FLAGS) \
@@ -65,10 +68,11 @@ CFLAGS += $(C_CPP_FLAGS) \
 #   -fno-exceptions
 #	-fno-unwind-tables, removes the .eh_frame section
 #   -fno-rtti \  
-CPPFLAGS += $(C_CPP_FLAGS) \
+CXXFLAGS += $(C_CPP_FLAGS) \
     -fno-exceptions \
 	-fno-unwind-tables \
-    -fno-rtti 
+    -fno-rtti \
+	-std=c++11
 
 LDFLAGS += \
 	-specs=nano.specs \
@@ -80,8 +84,6 @@ LDFLAGS += \
 	-Wl,--start-group -lm -lc_nano -lgcc -lstdc++ -lnosys -Wl,--end-group \
 	-T hf-risc.ld
 
-
-INCLUDES = .
 
 SRCS = \
 	syscalls.c \
@@ -109,7 +111,7 @@ $(OBJ_DIR)/%.o: %.c $(OBJ_DIR)
 $(OBJ_DIR)/%.o: %.cpp $(OBJ_DIR)
 	@echo "Compiling $<"
 	$(Q)$(MKDIR) -p $(dir $@)
-	$(Q)$(CPP) -c -o $@ $< $(CPPFLAGS)
+	$(Q)$(CPP) -c -o $@ $< $(CXXFLAGS)
 
 
 $(BUILD_DIR)/$(PROJECT).bin: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)/$(PROJECT).lst $(BUILD_DIR)/$(PROJECT).read

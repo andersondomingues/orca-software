@@ -20,7 +20,7 @@
 #ifndef _SIMPLE_H
 #define _SIMPLE_H
 
-#include <hf-risc.h>
+//#include <hf-risc.h>
 #include "orca-hardware-counters.h"
 
 //void simple(void); // __attribute__((section (".tasks")));
