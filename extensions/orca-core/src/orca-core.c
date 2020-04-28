@@ -20,21 +20,20 @@
 //basic resources
 #include "orca-core.h"
 
-//#include "../../../applications/int-mult/include/int-mult.h"
-//#include "../../../applications/float-mult/include/float-mult.h"
-//#include "../../../applications/cpp-float-mult/include/cpp-float-mult.h"
-//#include "../../../applications/cpp-mult/include/cpp-mult.h"
-//#include "../../../applications/mnist/include/mnist.h"
-//#include "../../../applications/mnist-ext-mult/include/mnist-ext-mult.h"
-//#include "../../../applications/mnist-ext-vet-mult/include/mnist-ext-vet-mult.h"
-//#include "../../../applications/mnist-ext-vet-seq-mult/include/mnist-ext-vet-seq-mult.h"
-//#include "../../../applications/mnist-ext-mult-dma/include/mnist-ext-mult-dma.h"
-#include "../../../applications/mnist-two-layers/include/mnist-two-layers.h"
-//#include "../../../applications/simple-dma/include/simple-dma.h"
+//task-specific headers
+#include "counter-test.h"
+/*
+#include "../../../extensions/orca-pubsub/include/pubsub-broker.h"
 
-//#include "../../../applications/cpp-mult/include/cpp-mult.h"
-//#include "../../../applications/ann/include/ann.h" 
-//#include "../../../applications/producer-consumer/include/producer-consumer.h" 
+#include "../../../applications/producer-consumer/include/producer-consumer.h"
+#include "../../../applications/producer-consumer-pubsub/include/producer-consumer-pubsub.h"
+
+#include "../../../applications/app-spawner/include/app-spawner.h"
+#include "../../../applications/app-bloater/include/app-bloater.h"
+#include "../../../applications/deadline-monitor/include/deadline-monitor.h"
+*/
+//#include "../../../applications/cpp-example/include/cpp-example.h"
+//#include "../../../applications/simple/include/simple.h"
 
 //Task mapping routine and entry-point. Please note that 
 //task mapping is done through software and the code below
@@ -43,31 +42,21 @@
 //routines that affect all applications can be handled here.
 void app_main(void)
 {   
-	//#ifdef CPU_ID == 22
+
+	hf_spawn(counter_test, 5, 4, 5, "counter_test", 1024);   // 4/5%
+	//hf_spawn(simple, 5, 4, 5, "simple", 1024);   // 4/5%
+	//hf_spawn(cpp_example, 5, 4, 5, "cpp_example", 1024);   // 4/5%
+
+    //#ifdef CPU_ID == 22
 	//hfs
 	//#elif CPU_ID == 32
-	//
+    //
 
-	//printf("cpu_id: %d\n", hf_cpuid());
-
-	//hf_spawn(int_mult, 5, 4, 5, "int_mult", 1024);   //10%
-	//hf_spawn(cpp_mult,5, 4, 5, "cpp_mult", 1024);   //10%
-	//hf_spawn(float_mult,  5, 4, 5, "float_mult", 1024);   //10%
-	//hf_spawn(cpp_float_mult,  5, 4, 5, "cpp_float_mult", 1024);   //10%
-	//hf_spawn(mnist, 5, 4, 5, "mnist", 128 * 1024);   // 128 Kbytes !!!
-	//hf_spawn(mnist_ext_mult, 5, 4, 5, "mnist_ext_mult", 128 * 1024);   // 128 Kbytes !!!
-	//hf_spawn(mnist_ext_vet_mult, 5, 4, 5, "mnist_ext_vet_mult", 128 * 1024);   // 128 Kbytes !!
-	//hf_spawn(mnist_ext_vet_seq_mult, 5, 4, 5, "mnist_ext_vet_seq_mult", 256 * 1024); // 256 Kbytes !!
-	//hf_spawn(mnist_ext_mult_dma, 5, 4, 5, "mnist_ext_mult_dma", 256 * 1024); // 256 Kbytes !!
-	hf_spawn(mnist_two_layers, 5, 4, 5, "mnist_two_layers", 128 * 1024); // 128 Kbytes !!
-	//hf_spawn(simple_dma, 5, 4, 5, "simple_dma", 1024);
-	//hf_spawn(int_mult, 5, 4, 5, "int_mult", 1024);   //10%
-	//hf_spawn(float_mult, 5, 4, 5, "float_mult", 1024);   //10%
-	//hf_spawn(cpp_mult, 5, 4, 5, "cpp_mult", 1024);   //10%
-	//hf_spawn(ann, 5, 4, 5, "ann", 10*1024);   //10% 
-	//hf_spawn(producer,5, 4, 5, "producer-task", 2048);
+    //printf("cpu_id: %d\n", hf_cpuid());
 
 /*
+	switch(hf_cpuid()){
+
 		//PRODUTOR-CONSUMIDOR
 		//hf_spawn(producer, 0, 0, 0, "producer-task", 2048);
 		//hf_spawn(consumer, 0, 0, 0, "consumer-task", 2048);
@@ -96,7 +85,7 @@ void app_main(void)
 		default: // << NONE
 			break;
 	}
-*/	
+*/
 	//spawn for all cores
 	//hf_spawn(counter_test, 0, 0, 0, "counters_test", 4096);
 

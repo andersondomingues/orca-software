@@ -1,4 +1,3 @@
-#include "orca-core.h"
 #include "orca-hardware-counters.h"
 
 #ifdef MEMORY_ENABLE_COUNTERS

@@ -1,6 +1,14 @@
 #ifndef __ORCA_HARDWARE_COUNTERS_H
 #define __ORCA_HARDWARE_COUNTERS_H
 
+//either use stdint.h or hellfire.h. both define uint32_t & cia
+#ifdef BARE_METAL
+    #include "stdint.h"
+#endif
+#ifdef HELFIREOS
+    #include "hellfire.h"
+#endif
+
 //0x403F1xxx => memory mapped counters
 #ifdef MEMORY_ENABLE_COUNTERS
 #define M0_COUNTER_STORE_ADDR (0x40411010)
