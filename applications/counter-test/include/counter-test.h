@@ -30,8 +30,8 @@
 #error "This application requires orca-mpsoc platform."
 #endif
 
-ifneq ($(PLATFORM), orca-mpsoc)
-$(error ERROR: PLATFORM = $(PLATFORM) is not compatible with orca-lib-client)
+ifneq ($(ORCA_PLATFORM), orca-mpsoc)
+$(error ERROR: ORCA_PLATFORM = $(ORCA_PLATFORM) is not compatible with orca-lib-client)
 endif
 */
 #ifndef HELLFIREOS

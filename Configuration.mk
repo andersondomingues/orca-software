@@ -14,21 +14,21 @@ GLOBAL_SETTINGS := -Wall -Wextra -Werror -g -std=c++17 -O3 -march=native -mtune=
 # be included in compilation unless you edit the file 
 #          extensions/orca-core/src/orca-core.cpp,
 # where you should simple of tasks in each of the cores. 
-ORCA_APPLICATIONS := counter-test
+ORCA_APPLICATIONS := simple
 #ORCA_APPLICATIONS := producer-consumer-pubsub producer-consumer app-spawner app-bloater deadline-monitor
 
 # Software extensions (experimental)
-#ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring
-ORCA_EXTENSIONS := orca-core orca-monitoring
+#ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring 
+ORCA_EXTENSIONS := orca-monitoring
 
 # part of the software, like the device drivers, might know plataform-specific details to parametrize the software.
 # one example is the NoC driver and the orca-lib-client. Both of them require details about the Hw NoC, the size of the MpSoC, etc. 
-# PLATFORM := (orca-dma | single-core)
-ORCA_PLATFORM := orca-mpsoc
+# ORCA_PLATFORM := (orca-mpsoc | single-core)
+ORCA_PLATFORM := single-core
 
 # select among the supported OS
 #ORCA_OS := (bare-metal/hf-riscv | hellfireos)
-ORCA_OS := hellfireos
+ORCA_OS := bare-metal/hf-riscv
 
 # ==================================================================[ ORCA ]
 # Width (x-axis coordinate) of the network-on-chip. Cannot be zero,

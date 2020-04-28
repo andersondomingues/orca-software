@@ -15,8 +15,8 @@ SIZE  = riscv64-unknown-elf-size
 
 # issue an error if trying to compile with an incompatible platform.
 # bare metal apps only work with single-core platform
-ifneq ($(PLATFORM), single-core)
-$(error ERROR: PLATFORM = $(PLATFORM) is not compatible with bare metal apps)
+ifneq ($(ORCA_PLATFORM), single-core)
+$(error ERROR: ORCA_PLATFORM = $(ORCA_PLATFORM) is not compatible with bare metal apps)
 endif
 
 CURR_DIR = $(ORCA_SW_DIR)/os/$(ORCA_OS)
