@@ -2,7 +2,9 @@
 
 
 #include <stdio.h>
+#include <stdint.h>
 #include <initializer_list>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,14 +107,14 @@ extern unsigned	_fini_array_size;
 
 int main() {
 
-  unsigned	text_size = (unsigned)&_text_size;
-  unsigned	bss_size = (unsigned)&_bss_size;
-  unsigned	heap_size = (unsigned)&_heap_size;
-  unsigned	stack_size = (unsigned)&_stack_size;
-  unsigned	data_size = (unsigned)&_data_size;
-  unsigned	init_array_size = (unsigned)&_init_array_size;
-  unsigned	preinit_array_size = (unsigned)&_preinit_array_size;
-  unsigned	fini_array_size = (unsigned)&_fini_array_size;
+  uintptr_t	text_size = (uintptr_t)&_text_size;
+  uintptr_t	bss_size = (uintptr_t)&_bss_size;
+  uintptr_t	heap_size = (uintptr_t)&_heap_size;
+  uintptr_t	stack_size = (uintptr_t)&_stack_size;
+  uintptr_t	data_size = (uintptr_t)&_data_size;
+  uintptr_t	init_array_size = (uintptr_t)&_init_array_size;
+  uintptr_t	preinit_array_size = (uintptr_t)&_preinit_array_size;
+  uintptr_t	fini_array_size = (uintptr_t)&_fini_array_size;
 
   printf("Memory sizes (bytes):\n-text: %d\n-data: %d\n-bss: %d\n-heap: %d\n-stack: %d\n-preinit: %d\n-init: %d\n-fini: %d\n",
     text_size,data_size,bss_size,heap_size,stack_size,preinit_array_size,init_array_size,fini_array_size);

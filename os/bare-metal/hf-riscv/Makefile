@@ -57,6 +57,8 @@ C_CPP_FLAGS += \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
+	-specs=nano.specs \
+	-fno-math-errno \
 	-nostdlib \
 	$(INC_DIRS)
 
@@ -75,12 +77,10 @@ CXXFLAGS += $(C_CPP_FLAGS) \
 	-std=c++11
 
 LDFLAGS += \
-	-specs=nano.specs \
 	-Wl,--gc-sections \
 	-Wl,--print-memory-usage \
 	-Wl,-Map=minimal.map \
 	$(LIB_DIR) \
-	-fno-math-errno \
 	-Wl,--start-group -lm -lc_nano -lgcc -lstdc++ -lnosys -Wl,--end-group \
 	-T hf-risc.ld
 
@@ -127,7 +127,7 @@ $(BUILD_DIR)/$(PROJECT).read: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)
 
 $(BUILD_DIR)/$(PROJECT).elf: $(OBJS)
 	@echo "Linking $@"
-	$(Q)$(CPP) $(CPPFLAGS) $^ $(LDFLAGS) -o $@	
+	$(Q)$(CPP) $(CXXFLAGS) $^ $(LDFLAGS) -o $@	
 
 clean:
 	@echo "Cleaning $<"

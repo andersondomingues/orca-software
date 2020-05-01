@@ -87,8 +87,8 @@ export LINKER_SCRIPT = $(CURR_DIR)/hf-risc.ld
 
 
 BARE_METAL_SRC = $(CURR_DIR)/crt0.s $(CURR_DIR)/startup.c $(CURR_DIR)/syscalls.c
-BARE_METAL_OBJS :=  $(BARE_METAL_SRC:.c=.o)
-BARE_METAL_OBJS +=  $(BARE_METAL_SRC:.s=.o)
+BARE_METAL_OBJS1 :=  $(BARE_METAL_SRC:.c=.o)
+BARE_METAL_OBJS  :=  $(BARE_METAL_OBJS1:.s=.o)
 
 $(OS_STATIC_LIB): $(BARE_METAL_OBJS)
 	@echo "$'\e[7m==================================\e[0m"
