@@ -14,5 +14,5 @@ APP_SIMPLE_SRCS := $(wildcard $(APP_SIMPLE_SRC)/*.c)
 APP_SIMPLE_OBJS :=  $(APP_SIMPLE_SRCS:.c=.o)
 
 $(APP_SIMPLE_LIB) : $(APP_SIMPLE_OBJS)
-	$(Q)$(AR) rcs $(APP_SIMPLE_LIB) $(APP_SIMPLE_OBJS) 
+	$(Q)$(AR) rcs $@ $^
 

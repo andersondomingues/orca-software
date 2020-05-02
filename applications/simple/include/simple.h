@@ -20,8 +20,13 @@
 #ifndef _SIMPLE_H
 #define _SIMPLE_H
 
-//#include <hf-risc.h>
-#include "orca-hardware-counters.h"
+#ifdef HELLFIREOS
+#include <hellfire.h>
+//#include <noc.h>
+#endif
+#ifdef BARE_METAL
+#include <stdio.h>
+#endif
 
 //void simple(void); // __attribute__((section (".tasks")));
 

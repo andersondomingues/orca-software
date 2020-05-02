@@ -14,4 +14,4 @@ APP_ANN_SRCS := $(wildcard $(APP_ANN_SRC)/*.c)
 APP_ANN_OBJS :=  $(APP_ANN_SRCS:.c=.o)
 
 $(APP_ANN_LIB) : $(APP_ANN_OBJS)
-	$(Q)$(AR) rcs $(APP_ANN_LIB) $(APP_ANN_OBJS) 
+	$(Q)$(AR) rcs $@ $^

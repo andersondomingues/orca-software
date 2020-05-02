@@ -21,7 +21,7 @@
 #include "orca-core.h"
 
 //task-specific headers
-#include "counter-test.h"
+//#include "mnist.h"
 /*
 #include "../../../extensions/orca-pubsub/include/pubsub-broker.h"
 
@@ -32,8 +32,7 @@
 #include "../../../applications/app-bloater/include/app-bloater.h"
 #include "../../../applications/deadline-monitor/include/deadline-monitor.h"
 */
-//#include "../../../applications/cpp-example/include/cpp-example.h"
-//#include "../../../applications/simple/include/simple.h"
+#include "../../../applications/mnist/include/mnist.h"
 
 //Task mapping routine and entry-point. Please note that 
 //task mapping is done through software and the code below
@@ -43,7 +42,7 @@
 void app_main(void)
 {   
 
-	hf_spawn(counter_test, 5, 4, 5, "counter_test", 1024);   // 4/5%
+	hf_spawn(mnist, 5, 4, 5, "mnist", 256*1024);   // 4/5%
 	//hf_spawn(simple, 5, 4, 5, "simple", 1024);   // 4/5%
 	//hf_spawn(cpp_example, 5, 4, 5, "cpp_example", 1024);   // 4/5%
 

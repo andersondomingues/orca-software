@@ -20,7 +20,13 @@
 #ifndef _SIMPLE_DMA_H
 #define _SIMPLE_DMA_H
 
+#ifdef HELLFIREOS
 #include <hellfire.h>
+//#include <noc.h>
+#endif
+#ifdef BARE_METAL
+#include <stdio.h>
+#endif
 
 void simple_dma(void); // __attribute__((section (".tasks")));
 

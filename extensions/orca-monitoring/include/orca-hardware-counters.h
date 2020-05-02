@@ -5,7 +5,7 @@
 #ifdef BARE_METAL
     #include "stdint.h"
 #endif
-#ifdef HELFIREOS
+#ifdef HELLFIREOS
     #include "hellfire.h"
 #endif
 

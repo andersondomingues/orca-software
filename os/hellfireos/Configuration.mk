@@ -15,7 +15,7 @@ MAX_TASKS = 30
 MUTEX_TYPE = 0
 MEM_ALLOC = 3
 HEAP_SIZE = 500000
-FLOATING_POINT = 0
+FLOATING_POINT = 1
 # Set level of logging for the HellfireOS kernel. 
 # 0 => disabled 
 # 1 => interruption and dispatch information (default)
@@ -25,7 +25,11 @@ KERNEL_LOG = 1
 #includes for kernel parts
 include $(HFOS_DIR)/arch/$(ARCH)/arch.mak
 include $(HFOS_DIR)/lib/lib.mak
+# if this variable is empty, then i dont need to compile the noc driver. 
+# hellfire will be used in a single core instead of a mpsoc
+ifneq ($(ORCA_NOC_HEIGHT), )
 include $(HFOS_DIR)/drivers/noc.mak
+endif
 include $(HFOS_DIR)/sys/kernel.mak
 
 # common definition to all software modules
@@ -52,10 +56,12 @@ $(OS_STATIC_LIB):
 	@echo "$'\e[7m  Making Kernel ...  libc             \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 	$(Q)make libc
+ifneq ($(ORCA_NOC_HEIGHT), )
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Making Kernel ...     noc           \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 	$(Q)make noc
+endif
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Making Kernel ...   kernel            \e[0m"
 	@echo "$'\e[7m==================================\e[0m"

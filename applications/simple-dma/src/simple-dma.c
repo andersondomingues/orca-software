@@ -21,6 +21,12 @@
 #include "simple-dma.h"
 #include "orca-hardware-counters.h"
 
+#ifdef BARE_METAL
+int32_t ftoa(float f, int8_t *outbuf, int32_t precision);
+int8_t *itoa(int32_t i, int8_t *s, int32_t base);
+#endif
+
+
 // SIMD floating point multiplier, capable of up to 16 mult in 'parallel'
 #define SIGNAL_DMA_PROG     (volatile uint8_t*)0x40410002
 
@@ -82,8 +88,10 @@ void simple_dma (void) {
 	}
 	printf("### FINISHED! ###.\n"); 
 
+#ifdef MEMORY_ENABLE_COUNTERS
 	printf("MEM0: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
 	printf("---\n");
+#endif
 
 	printf("CPU: arith=%u, logical=%u\n",   *CPU_COUNTER_ARITH, *CPU_COUNTER_LOGICAL);
 	printf("CPU: shift=%u, branches=%u\n",  *CPU_COUNTER_SHIFT, *CPU_COUNTER_BRANCHES);
@@ -92,5 +100,107 @@ void simple_dma (void) {
 	printf("CPU: hosttime=%u\n", *CPU_COUNTER_HOSTTIME);
 	printf("---\n");
 
+#ifdef HELLFIREOS
 	hf_kill(hf_selfid());
+#endif
 }
+
+#ifdef BARE_METAL
+
+void main(){
+	simple_dma();
+}
+
+
+union float_long{
+	float f;
+	int32_t l;
+	uint32_t u;
+};
+
+int8_t *itoa(int32_t i, int8_t *s, int32_t base){
+	int8_t *ptr = s, *ptr1 = s, tmp_char;
+	int32_t tmp_value;
+
+	if (base < 2 || base > 36) {
+		*s = '\0';
+		return s;
+	}
+	do {
+		tmp_value = i;
+		i /= base;
+		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - i * base)];
+	} while (i);
+	if (tmp_value < 0)
+		*ptr++ = '-';
+	*ptr-- = '\0';
+	while(ptr1 < ptr) {
+		tmp_char = *ptr;
+		*ptr--= *ptr1;
+		*ptr1++ = tmp_char;
+	}
+	return s;
+}
+
+
+int32_t ftoa(float f, int8_t *outbuf, int32_t precision){
+	int32_t mantissa, int_part, frac_part, exp2, i;
+	int8_t *p;
+	union float_long fl;
+
+	p = outbuf;
+
+	if (f < 0.0){
+		*p = '-';
+		f = -f;
+		p++;
+	}
+
+	fl.f = f;
+
+	exp2 = (fl.l >> 23) - 127;
+	mantissa = (fl.l & 0xffffff) | 0x800000;
+	frac_part = 0;
+	int_part = 0;
+
+	if (exp2 >= 31){
+		return -1;	/* too large */
+	}else{
+		if (exp2 < -23){
+//			return -1;	/* too small */
+		}else{
+			if (exp2 >= 23){
+				int_part = mantissa << (exp2 - 23);
+			}else{
+				if (exp2 >= 0){
+					int_part = mantissa >> (23 - exp2);
+					frac_part = (mantissa << (exp2 + 1)) & 0xffffff;
+				}else{
+					frac_part = (mantissa & 0xffffff) >> (-(exp2 + 1));
+				}
+			}
+		}
+	}
+
+	if (int_part == 0){
+		*p = '0';
+		p++;
+	}else{
+		itoa(int_part, p, 10);
+		while(*p) p++;
+	}
+	*p = '.';
+	p++;
+
+	for (i = 0; i < precision; i++){
+		frac_part = (frac_part << 3) + (frac_part << 1);
+		*p = (frac_part >> 24) + '0';
+		p++;
+		frac_part = frac_part & 0xffffff;
+	}
+
+	*p = 0;
+
+	return 0;
+}	
+#endif

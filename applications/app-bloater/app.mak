@@ -5,6 +5,10 @@ APP_BLOATER_SRC   := $(APP_BLOATER_DIR)/src
 APP_BLOATER_INC   := $(APP_BLOATER_DIR)/include
 APP_BLOATER_LIB   := app-$(APP_BLOATER_NAME).a
 
+ifneq ($(ORCA_PLATFORM), orca-mpsoc)
+$(error ERROR: this application requires the orca-mpsoc platform)
+endif
+
 INC_DIRS += -I$(APP_BLOATER_INC)
 
 CFLAGS += 
@@ -14,4 +18,4 @@ APP_BLOATER_SRCS := $(wildcard $(APP_BLOATER_SRC)/*.c)
 APP_BLOATER_OBJS :=  $(APP_BLOATER_SRCS:.c=.o)
 
 $(APP_BLOATER_LIB) : $(APP_BLOATER_OBJS)
-	$(Q)$(AR) rcs $(APP_BLOATER_LIB) $(APP_BLOATER_OBJS) 
+	$(Q)$(AR) rcs $@ $^
