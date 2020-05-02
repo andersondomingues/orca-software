@@ -40,6 +40,8 @@ CFLAGS += -DCPU_ARCH=$(CPU_ARCH) \
 	-DKERNEL_LOG=$(KERNEL_LOG) 
 
 export KERNEL_LOG_LEVEL
+# TODO dirty hack to work with bare-metal
+OS_OBJS := 
 
 $(OS_STATIC_LIB):
 	@echo "$'\e[7m==================================\e[0m"

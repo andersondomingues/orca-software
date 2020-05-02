@@ -39,7 +39,6 @@ LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
 # remember the kernel, as well as the application, will be compiled using the *same* compiler and flags!
 ASMFLAGS = -march=rv32im -mabi=ilp32 -fPIC
 
-# COMPLINE refers to ORCA parameters
 # DBARE_METAL and DBARE_METAL_HF_RISC might be used in the software
 # these are the flags that work for both C and C++
 C_CPP_FLAGS += \
@@ -56,7 +55,6 @@ C_CPP_FLAGS += \
 	-specs=nano.specs \
 	-nostdlib \
 	$(INC_DIRS) \
-	$(COMPLINE) \
 	-DBARE_METAL \
 	-DBARE_METAL_HF_RISC
 
@@ -85,13 +83,13 @@ LDFLAGS += \
 export LINKER_SCRIPT = $(CURR_DIR)/hf-risc.ld
 
 
-
 BARE_METAL_SRC = $(CURR_DIR)/crt0.s $(CURR_DIR)/startup.c $(CURR_DIR)/syscalls.c
 BARE_METAL_OBJS1 :=  $(BARE_METAL_SRC:.c=.o)
 BARE_METAL_OBJS  :=  $(BARE_METAL_OBJS1:.s=.o)
+OS_OBJS := $(BARE_METAL_OBJS)
 
 $(OS_STATIC_LIB): $(BARE_METAL_OBJS)
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Making bare metal  ...          \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
-	$(Q)$(AR) rcs $(OS_STATIC_LIB) $(CURR_DIR)/*.o
+	$(Q)$(AR) rcs $@ $^

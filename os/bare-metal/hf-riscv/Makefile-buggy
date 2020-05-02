@@ -3,7 +3,7 @@
 # replace MAIN_FILE by the name of the test app. 
 # $ make MAIN_FILE=<main code> all
 
-MAIN_FILE ?=with-cpp/main.cpp
+MAIN_FILE ?=simple.c
 # extracts the 'main'
 #PROJECT = $(suffix $(basename $(MAIN_FILE)))
 PROJECT = main
@@ -36,8 +36,9 @@ LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_C))))
 
 #LDFLAGS += -L/opt/gcc-riscv64/riscv-gcc-8.3.0-sifive/riscv64-unknown-elf/lib/rv32im/ilp32
 LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
+LIBS = -lm -lc_nano -lgcc -lstdc++ -lnosys
 
-INC_DIRS += -I.
+INC_DIRS += -I. -I/home/lsa/repos/anderson/orca-software-tools/extensions/orca-monitoring/include
 
 #
 #	-Wl,--build-id \
@@ -55,12 +56,14 @@ C_CPP_FLAGS += \
 	-Os \
 	-D_DEBUG \
 	-DCONFIG_CPLUSPLUS \
+	-DBARE_METAL \
+	-specs=nano.specs \
+	-fno-math-errno \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
-	-specs=nano.specs \
-	-fno-math-errno \
 	-nostdlib \
+	-DMEMORY_ENABLE_COUNTERS -DHFRISCV_ENABLE_COUNTERS -DROUTER_ENABLE_COUNTERS \
 	$(INC_DIRS)
 
 # these are the flags only for C
@@ -82,7 +85,16 @@ LDFLAGS += \
 	-Wl,--print-memory-usage \
 	-Wl,-Map=minimal.map \
 	$(LIB_DIR) \
-	-Wl,--start-group -lm -lc_nano -lgcc -lstdc++ -lnosys -Wl,--end-group \
+	-Wl,--start-group $(LIBS) -Wl,--end-group \
+	-T hf-risc.ld
+
+LDLDFLAGS += \
+	-melf32lriscv \
+	--gc-sections \
+	--print-memory-usage \
+	-Map=minimal.map \
+	$(LIB_DIR) \
+	--start-group  $(LIBS) --end-group \
 	-T hf-risc.ld
 
 
@@ -90,6 +102,7 @@ SRCS = \
 	syscalls.c \
 	crt0.s \
 	startup.c \
+	ext-orca-monitoring.a \
 	$(MAIN_FILE)
 
 OBJ_DIR = $(BUILD_DIR)/objs
@@ -134,6 +147,16 @@ $(BUILD_DIR)/$(PROJECT).read: $(BUILD_DIR)/$(PROJECT).elf $(BUILD_DIR)
 $(BUILD_DIR)/$(PROJECT).elf: $(OBJS)
 	@echo "Linking $@"
 	$(Q)$(CPP) $(CXXFLAGS) -Wl,--start-group $^ -Wl,--end-group $(LDFLAGS) -o $@	
+
+build/bare-metal.a : build/objs/syscalls.o build/objs/crt0.o build/objs/startup.o
+	$(Q)$(AR) rcs $@ $^
+
+build/app.a : build/objs/simple.o 
+	$(Q)$(AR) rcs $@ $^
+
+#$(BUILD_DIR)/$(PROJECT).elf: build/bare-metal.a build/app.a ext-orca-monitoring.a
+#	@echo "Linking $@"
+#	$(Q)$(LD)   $(LDLDFLAGS) --start-group $^ --end-group -o $@	
 
 clean:
 	@echo "Cleaning $<"

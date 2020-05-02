@@ -20,6 +20,10 @@ all:  $(IMAGE_NAME).bin
 # get the OS depedent parameters. it also defines the OS_STATIC_LIB rule to compile the OS
 include ./os/$(ORCA_OS)/Configuration.mk
 
+# include the definitions from the main Configuration.mk
+CFLAGS += $(COMPLINE)
+CXXFLAGS += $(COMPLINE)
+
 #compile only the requested tasks 
 $(foreach module,$(ORCA_APPLICATIONS),$(eval include applications/$(module)/app.mak))
 #compile only the requested extensions 
@@ -66,7 +70,7 @@ $(IMAGE_NAME).bin: $(OS_STATIC_LIB) ext app
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Linking Software ...            \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
-	$(Q)$(LD) $(BARE_METAL_OBJS) --start-group *.a --end-group $(LDFLAGS) -T$(LINKER_SCRIPT) -o $(IMAGE_NAME).elf 
+	$(Q)$(LD) $(OS_OBJS) --start-group *.a --end-group $(LDFLAGS) -T$(LINKER_SCRIPT) -o $(IMAGE_NAME).elf 
 	#$(Q)$(CC)  $(CFLAGS) -Wl,--gc-sections -Wl,--print-memory-usage -Wl,-Map=minimal.map -Wl,-T$(LINKER_SCRIPT) $(BARE_METAL_SRC)  -Wl,--start-group *.a -lm -lc_nano -lgcc -lstdc++ -lnosys -Wl,--end-group    -o $(IMAGE_NAME).elf 
 	#$(Q)$(LD)  -melf32lriscv  --gc-sections --print-memory-usage -Map=minimal.map -T$(LINKER_SCRIPT) -L/opt/gcc-riscv/lib/gcc/riscv64-unknown-elf/8.3.0/rv32im/ilp32/  -L/opt/gcc-riscv/riscv64-unknown-elf/lib/rv32im/ilp32/ $(BARE_METAL_OBJS)  --start-group *.a -lm -lc_nano -lgcc -lstdc++ -lnosys --end-group    -o $(IMAGE_NAME).elf 
 	$(Q)$(DUMP) --disassemble --reloc $(IMAGE_NAME).elf > $(IMAGE_NAME).lst
