@@ -5,7 +5,7 @@ APP_MNIST_TWO_LAYERS_SRC   := $(APP_MNIST_TWO_LAYERS_DIR)/src
 APP_MNIST_TWO_LAYERS_INC   := $(APP_MNIST_TWO_LAYERS_DIR)/include
 APP_MNIST_TWO_LAYERS_LIB   := app-$(APP_MNIST_TWO_LAYERS_NAME).a
 
-$(info $$PWD = [$(shell pwd)])
+#$(info $$PWD = [$(shell pwd)])
 
 INC_DIRS += -I$(APP_MNIST_TWO_LAYERS_INC)
  

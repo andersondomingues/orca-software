@@ -188,10 +188,10 @@ void mnist_two_layers () {
 		printf("Number %d identified!\n",idx);
 	}
 
+#ifdef MEMORY_ENABLE_COUNTERS
 	printf("MEM0: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
-	printf("MEM1: writes=%u, reads=%u\n", *M1_COUNTER_STORE, *M1_COUNTER_LOAD);
-	printf("MEM2: writes=%u, reads=%u\n", *M2_COUNTER_STORE, *M2_COUNTER_LOAD);
 	printf("---\n");
+#endif
 
 	printf("CPU: arith=%u, logical=%u\n",   *CPU_COUNTER_ARITH, *CPU_COUNTER_LOGICAL);
 	printf("CPU: shift=%u, branches=%u\n",  *CPU_COUNTER_SHIFT, *CPU_COUNTER_BRANCHES);
@@ -200,5 +200,14 @@ void mnist_two_layers () {
 	printf("CPU: hosttime=%u\n", *CPU_COUNTER_HOSTTIME);
 	printf("---\n");
 
+#ifdef HELLFIREOS
 	hf_kill(hf_selfid());
+#endif
 }
+
+
+#ifdef BARE_METAL
+	void main(){
+		mnist_two_layers();
+	}
+#endif

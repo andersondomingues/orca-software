@@ -20,7 +20,13 @@
 #ifndef _MNIST_H
 #define _MNIST_H
 
+#ifdef HELLFIREOS
 #include <hellfire.h>
+//#include <noc.h>
+#endif
+#ifdef BARE_METAL
+#include <stdio.h>
+#endif
 
 void mnist(void); // __attribute__((section (".tasks")));
 

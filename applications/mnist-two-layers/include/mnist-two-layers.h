@@ -20,7 +20,13 @@
 #ifndef _MNIST_TWO_LAYERS_H
 #define _MNIST_TWO_LAYERS_H
 
+#ifdef HELLFIREOS
 #include <hellfire.h>
+//#include <noc.h>
+#endif
+#ifdef BARE_METAL
+#include <stdio.h>
+#endif
 
 void mnist_two_layers(void); // __attribute__((section (".tasks")));
 

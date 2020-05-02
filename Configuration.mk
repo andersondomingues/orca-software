@@ -3,7 +3,7 @@
 # be included in compilation unless you edit the file 
 #          extensions/orca-core/src/orca-core.cpp,
 # where you should simple of tasks in each of the cores. 
-ORCA_APPLICATIONS := counter-test
+ORCA_APPLICATIONS := ann
 #ORCA_APPLICATIONS := producer-consumer-pubsub producer-consumer app-spawner app-bloater deadline-monitor
 
 # Software extensions (experimental)

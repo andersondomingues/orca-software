@@ -46,3 +46,10 @@ void counter_test(void){
 	//hf_kill(hf_selfid());
 	//while(1);
 }
+
+
+#ifdef BARE_METAL
+	void main(){
+		counter_test();
+	}
+#endif
