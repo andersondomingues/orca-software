@@ -1,5 +1,5 @@
 # Do not modify the lines below
-APP_NAME = simple
+APP_NAME = test
 APP_DIR   := .
 APP_SRC   := .
 APP_INC   := $(APP_DIR)
