@@ -2,6 +2,13 @@
 printf from hellfireos
 https://github.com/sjohann81/hellfireos/tree/master/lib/libc
 */
+#ifndef __HF_PRINTF__
+#define __HF_PRINTF__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdarg.h>
 #include <stdint.h>
 
@@ -241,3 +248,10 @@ int32_t ftoa(float f, int8_t *outbuf, int32_t precision){
 
 	return 0;
 }
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif //__HF_PRINTF__
