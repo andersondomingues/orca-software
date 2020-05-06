@@ -5,7 +5,7 @@ APP_SRC   := .
 APP_INC   := $(APP_DIR)
 APP_LIB   := app-$(APP_NAME).a 
 
-INC_DIRS += -I$(APP_INC) -I/opt/gcc-riscv64/riscv-gcc-8.3.0-sifive/riscv64-unknown-elf/include/c++/8.3.0/
+INC_DIRS += -I.. -I$(APP_INC) -I/opt/gcc-riscv64/riscv-gcc-8.3.0-sifive/riscv64-unknown-elf/include/c++/8.3.0/
 
 CFLAGS += -DUSE_ORCA
 CXXFLAGS += -std=c++0x -DUSE_ORCA
