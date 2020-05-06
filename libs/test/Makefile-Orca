@@ -1,33 +1,47 @@
-#main configuration file
-include Configuration.mk
+# concat the required libs to build the image 
+include Makefile-Orca-App
+
+# set these variable accordingly
+ORCA_SIM_DIR = /home/lsa/repos/anderson/orca-sim
+ORCA_SW_DIR = /home/lsa/repos/anderson/orca-software-tools/
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
 export Q := @
-# Do not print "Entering directory ...". 
+# Do not print "Entering directory ...".
 MAKEFLAGS += --no-print-directory
 endif
 
-ORCA_SIM_DIR = ../orca-sim
-ORCA_SW_DIR = $(shell pwd)
-
 IMAGE_NAME = image
+APP_STATIC_LIBS = app-$(APP_NAME).a
+
+# Software extensions (experimental)
+#ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring 
+ORCA_EXTENSIONS := orca-monitoring 
+
+# part of the software, like the device drivers, might know plataform-specific details to parametrize the software.
+# one example is the NoC driver and the orca-lib-client. Both of them require details about the Hw NoC, the size of the MpSoC, etc. 
+# ORCA_PLATFORM := (orca-mpsoc | single-core | single-core-nn)
+ORCA_PLATFORM := single-core
+
+# select among the supported OS
+#ORCA_OS := (bare-metal/hf-riscv | hellfireos)
+ORCA_OS := bare-metal/hf-riscv
+
 
 # do not move this from here
 all:  $(IMAGE_NAME).bin
 	@echo "done"
 
 # get the OS depedent parameters. it also defines the OS_STATIC_LIB rule to compile the OS
-include ./os/$(ORCA_OS)/Configuration.mk
+include $(ORCA_SW_DIR)/os/$(ORCA_OS)/Configuration.mk
 
 # include the definitions from the main Configuration.mk
 CFLAGS += $(COMPLINE)
 CXXFLAGS += $(COMPLINE)
 
-#compile only the requested tasks 
-$(foreach module,$(ORCA_APPLICATIONS),$(eval include applications/$(module)/app.mak))
 #compile only the requested extensions 
-$(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak))
+$(foreach module,$(ORCA_EXTENSIONS),$(eval include $(ORCA_SW_DIR)/extensions/$(module)/ext.mak))
 
 #phonies
 .PHONY: clean
@@ -35,8 +49,6 @@ $(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak)
 # get the platform depedent parameters. 
 include $(ORCA_SIM_DIR)/platforms/$(ORCA_PLATFORM)/Configuration.mk
 
-# concat the required libs and apps to build the image 
-$(foreach module,$(ORCA_APPLICATIONS), $(eval APP_STATIC_LIBS := $(APP_STATIC_LIBS) app-$(module).a))
 $(foreach module,$(ORCA_EXTENSIONS),   $(eval EXT_STATIC_LIBS := $(EXT_STATIC_LIBS) ext-$(module).a))
 STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(EXT_STATIC_LIBS)
 
@@ -87,3 +99,4 @@ clean:
 	$(Q)-find . -type f -name '*.o' -delete
 	$(Q)-find . -type f -name '*.a' -delete
 	$(Q)-find . -type f -name '$(IMAGE_NAME).*' -delete
+

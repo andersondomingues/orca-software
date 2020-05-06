@@ -53,7 +53,7 @@ extern unsigned _sstack;
 extern unsigned _estack;
 
 // used only when c++ is required
-#ifdef CONFIG_CPLUSPLUS
+#ifdef USE_CPP
 extern ptr_func_t __preinit_array_start[];
 extern ptr_func_t __preinit_array_end[];
 
@@ -96,7 +96,7 @@ static INLINE void fill_heap(unsigned fill) {
 }
 */
 
-#ifdef CONFIG_CPLUSPLUS
+#ifdef USE_CPP
 
 static INLINE void call_init_array() {
     ptr_func_t *array = __preinit_array_start;
@@ -130,13 +130,13 @@ void RESET_handler() {
     //copy_data();
     zero_bss();
     //fill_heap(0x45455246);
-#ifdef CONFIG_CPLUSPLUS
+#ifdef USE_CPP
     call_init_array();
 #endif
     // run application
     main();
     // call destructors for static instances
-#ifdef CONFIG_CPLUSPLUS
+#ifdef USE_CPP
     call_fini_array();
 #endif    
 }

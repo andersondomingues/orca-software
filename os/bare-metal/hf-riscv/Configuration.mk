@@ -1,4 +1,15 @@
-# bare metal configuration for hf-riscv processor, single-core platform
+# Bare metal configuration for hf-riscv processor, single-core platform
+# These are the defines the app's makefile can change:
+# - INC_DIRS - use it to define the app's include dirs
+# - LIB_DIR	 - use it to define the app's lib dirs
+# - LIBS     - use it to define the app's libs. 
+# - DEFINES  - use it to create the app's defines.
+# - ASMFLAGS - asm related flags
+# - CFLAGS   - gcc related flags
+# - CXXFLAGS - g++ related flags
+# - LDFLAGS  - linker related flags
+# - USE_LIBC - define/undefine this symbol to turn newlib on/off
+# - USE_CPP  - define/undefine this symbol to turn cpp on/off
 
 # name of the lib
 export OS_STATIC_LIB := bare-metal.a
@@ -21,10 +32,6 @@ endif
 
 CURR_DIR = $(ORCA_SW_DIR)/os/$(ORCA_OS)
 
-# nothing to include
-#INC_DIRS += -I$(CURR_DIR)
-INC_DIRS += 
-
 ## fin the lib dir inside the toolchain
 DIR_LIB_GCC=$(shell $(CC)  -march=rv32im -mabi=ilp32 --print-file-name=libgcc.a)
 DIR_LIB_C=$(shell riscv64-unknown-elf-gcc  -march=rv32im -mabi=ilp32 --print-file-name=libm.a)
@@ -33,11 +40,33 @@ LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_GCC))))
 LIB_DIR_LIST +=  $(dir $(abspath $(lastword $(DIR_LIB_C))))
 
 #LDFLAGS += -L/opt/gcc-riscv/riscv64-unknown-elf/lib/rv32im/ilp32/
-LIB_DIR  = $(patsubst %, -L%, $(LIB_DIR_LIST))
+LIB_DIR  += $(patsubst %, -L%, $(LIB_DIR_LIST))
 
-# this is stuff used everywhere - compiler and flags should be declared (ASFLAGS, CFLAGS, LDFLAGS, LINKER_SCRIPT, CC, AS, LD, DUMP, READ, OBJ and SIZE).
-# remember the kernel, as well as the application, will be compiled using the *same* compiler and flags!
-ASMFLAGS = -march=rv32im -mabi=ilp32 -fPIC
+# if they were not defined by the app's make, then define it
+INC_DIRS ?= 
+DEFINES ?= 
+LIBS ?= 
+
+ifeq ($(USE_LIBC),)
+  $(info LIBC support is disabled)
+  BARE_METAL_SRC = $(CURR_DIR)/crt0.s $(CURR_DIR)/startup.c
+else
+  $(info LIBC support is enabled)
+  DEFINES += -DUSE_LIBC
+  LIBS += -lm -lc_nano -lgcc -lnosys
+  BARE_METAL_SRC = $(CURR_DIR)/crt0.s $(CURR_DIR)/startup.c $(CURR_DIR)/syscalls.c
+endif
+
+ifeq ($(USE_CPP),)
+  $(info CPP support is disabled)
+else
+  $(info CPP support is enabled)
+  DEFINES += -DUSE_CPP
+  LIBS += -lstdc++
+endif
+
+# the application will be compiled using the *same* compiler and flags!
+ASMFLAGS += -march=rv32im -mabi=ilp32 -fPIC
 
 # DBARE_METAL and DBARE_METAL_HF_RISC might be used in the software
 # these are the flags that work for both C and C++
@@ -46,8 +75,7 @@ C_CPP_FLAGS += \
 	-Wall \
 	-O2 \
 	-Os \
-	-D_DEBUG \
-	-DCONFIG_CPLUSPLUS \
+	$(DEFINES) \
 	-ffreestanding \
 	-ffunction-sections \
 	-fdata-sections \
@@ -62,10 +90,7 @@ C_CPP_FLAGS += \
 CFLAGS += $(C_CPP_FLAGS) \
 	-std=c11 
 
-# c++ related flags
-#   -fno-exceptions
-#	-fno-unwind-tables, removes the .eh_frame section
-#   -fno-rtti \  
+# c++ related flags 
 CXXFLAGS += $(C_CPP_FLAGS) \
     -fno-exceptions \
 	-fno-unwind-tables \
@@ -78,12 +103,10 @@ LDFLAGS += \
 	--print-memory-usage \
 	-Map=$(IMAGE_NAME).map \
 	$(LIB_DIR) \
-	--start-group -lm -lc_nano -lgcc -lstdc++ -lnosys --end-group 
+	--start-group $(LIBS) --end-group 
 
 export LINKER_SCRIPT = $(CURR_DIR)/hf-risc.ld
 
-
-BARE_METAL_SRC = $(CURR_DIR)/crt0.s $(CURR_DIR)/startup.c $(CURR_DIR)/syscalls.c
 BARE_METAL_OBJS1 :=  $(BARE_METAL_SRC:.c=.o)
 BARE_METAL_OBJS  :=  $(BARE_METAL_OBJS1:.s=.o)
 OS_OBJS := $(BARE_METAL_OBJS)

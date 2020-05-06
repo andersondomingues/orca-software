@@ -32,6 +32,11 @@ int _close(int file) {
   return -1;
 }
 
+int _open (char *file, int   flags, int   mode)
+{
+  return -1;
+}
+
 int _fstat(int file, struct stat *st) {
   st->st_mode = S_IFCHR;
 
@@ -144,38 +149,3 @@ extern "C" int __aeabi_atexit(
 void* __dso_handle = nullptr;
 
 */
-
-
-//////////////////////////////////////
-// if the heap is not used
-//////////////////////////////////////
-//extern "C" void *malloc(size_t) {return (void *)0;}
-//extern "C" void free(void *) {  }
-
-#ifdef _DEBUG
-// used only to debug syscalls
-int8_t *itoa_syscall(int32_t i, int8_t *s, int32_t base){
-	int8_t *ptr = s, *ptr1 = s, tmp_char;
-	int32_t tmp_value;
-
-	if (base < 2 || base > 36) {
-		*s = '\0';
-		return s;
-	}
-	do {
-		tmp_value = i;
-		i /= base;
-		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - i * base)];
-	} while (i);
-	if (tmp_value < 0)
-		*ptr++ = '-';
-	*ptr-- = '\0';
-	while(ptr1 < ptr) {
-		tmp_char = *ptr;
-		*ptr--= *ptr1;
-		*ptr1++ = tmp_char;
-	}
-	return s;
-}
-#endif
-

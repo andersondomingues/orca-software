@@ -18,7 +18,6 @@ volatile uint32_t* EXIT = (volatile uint32_t*) EXIT_TRAP;
 
 // LIBC SYSCALLS
 /////////////////////
-
 extern uint32_t __heap_start;
 extern uint32_t __heap_end;
 extern uint32_t __data_start;
@@ -28,13 +27,9 @@ extern uint32_t _estack;
 extern uint32_t _sbss;
 extern uint32_t _ebss;
 
-#ifdef _DEBUG
-// used only to debug syscalls
-int8_t *itoa_syscal(int32_t i, int8_t *s, int32_t base);
-#endif
-
 void *_sbrk(int incr);
 int _close(int file) ;
+int _open (char *file, int   flags, int   mode);
 int _fstat(int file, struct stat *st) ;
 int _isatty(int file) ;
 int _lseek(int file, int ptr, int dir);
@@ -46,8 +41,6 @@ int _read (int file, char * ptr, int len) ;
 
 // c++
 void __dso_handle(void);
-
-
 
 #ifdef __cplusplus
 }

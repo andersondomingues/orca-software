@@ -18,7 +18,11 @@
 
 ENTRY(_entry)
 
-/*  */
+/*  
+add the following line in the app make to redefine one of the following symbols
+example:
+LDFLAGS += --defsym=RAM_SIZE=7M
+*/
 
 /** if the flash size is not defined, the default is 1Mbyte*/
 FLASH_SIZE = DEFINED(FLASH_SIZE) ? FLASH_SIZE : 1M;
