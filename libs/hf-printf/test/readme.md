@@ -21,10 +21,10 @@ This is the detailed code size information
 ```
 python ../../../tools/linker-map-summary/analyze_map.py image.map
 orca-software-tools/os/bare-metal/hf-riscv/startup.o 	        109  (code: 36 data: 73)
-ext-orca-monitoring.a(orca-hardware-counters.o) 	            110  (code: 0 data: 110)
-orca-software-tools/os/bare-metal/hf-riscv/crt0.o 	            251  (code: 192 data: 59)
-app-test.a(test.o)                     	                        2217  (code: 2143 data: 74)
-gcc/riscv64-unknown-elf/8.3.0/rv32im/ilp32/libgcc.a(lesf2.o)    3039  (code: 180 data: 2859)
+lib-orca-monitoring.a(orca-hardware-counters.o) 	           110  (code: 0 data: 110)
+orca-software-tools/os/bare-metal/hf-riscv/crt0.o 	           251  (code: 192 data: 59)
+app-test.a(test.o)                     	                    2217  (code: 2143 data: 74)
+gcc/riscv64-unknown-elf/8.3.0/rv32im/ilp32/libgcc.a(lesf2.o)  3039  (code: 180 data: 2859)
 *fill*                                   	                    12297 (code: 1 data: 12296)
 TOTAL 18023  (code: 2552 data: 15471)
 ```

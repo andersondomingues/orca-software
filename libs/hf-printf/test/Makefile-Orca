@@ -15,9 +15,9 @@ endif
 IMAGE_NAME = image
 APP_STATIC_LIBS = app-$(APP_NAME).a
 
-# Software extensions (experimental)
-#ORCA_EXTENSIONS := orca-core orca-pubsub orca-monitoring 
-ORCA_EXTENSIONS := orca-monitoring 
+# Software libs (experimental)
+#ORCA_LIBS := orca-core orca-pubsub orca-monitoring 
+ORCA_LIBS := orca-monitoring 
 
 # part of the software, like the device drivers, might know plataform-specific details to parametrize the software.
 # one example is the NoC driver and the orca-lib-client. Both of them require details about the Hw NoC, the size of the MpSoC, etc. 
@@ -40,8 +40,8 @@ include $(ORCA_SW_DIR)/os/$(ORCA_OS)/Configuration.mk
 CFLAGS += $(COMPLINE)
 CXXFLAGS += $(COMPLINE)
 
-#compile only the requested extensions 
-$(foreach module,$(ORCA_EXTENSIONS),$(eval include $(ORCA_SW_DIR)/extensions/$(module)/ext.mak))
+#compile only the requested libs 
+$(foreach module,$(ORCA_LIBS),$(eval include $(ORCA_SW_DIR)/libs/$(module)/ext.mak))
 
 #phonies
 .PHONY: clean
@@ -49,8 +49,8 @@ $(foreach module,$(ORCA_EXTENSIONS),$(eval include $(ORCA_SW_DIR)/extensions/$(m
 # get the platform depedent parameters. 
 include $(ORCA_SIM_DIR)/platforms/$(ORCA_PLATFORM)/Configuration.mk
 
-$(foreach module,$(ORCA_EXTENSIONS),   $(eval EXT_STATIC_LIBS := $(EXT_STATIC_LIBS) ext-$(module).a))
-STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(EXT_STATIC_LIBS)
+$(foreach module,$(ORCA_LIBS),   $(eval LIB_STATIC_LIBS := $(LIB_STATIC_LIBS) lib-$(module).a))
+STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(LIB_STATIC_LIBS)
 
 # general rule to compile all .c software
 .c.o:
@@ -64,11 +64,11 @@ STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(EXT_STATIC_LIBS)
 .s.o:
 	$(Q)$(AS) -c $(ASMFLAGS) -o $@ $<
 
-ext: ext_banner $(EXT_STATIC_LIBS)
+lib: lib_banner $(LIB_STATIC_LIBS)
 
-ext_banner:
+lib_banner:
 	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m  Making Extensions ...           \e[0m"
+	@echo "$'\e[7m  Making LIBS ...                 \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 	
 app: app_banner $(APP_STATIC_LIBS)
@@ -78,7 +78,7 @@ app_banner:
 	@echo "$'\e[7m  Making Applications ..          \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 
-$(IMAGE_NAME).bin: $(OS_STATIC_LIB) ext app
+$(IMAGE_NAME).bin: $(OS_STATIC_LIB) lib app
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Linking Software ...            \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
