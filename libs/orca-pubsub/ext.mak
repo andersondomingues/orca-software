@@ -1,9 +1,9 @@
 # Do not modify the lines below
 ORCA_PUBSUB_NAME  := orca-pubsub
-ORCA_PUBSUB_DIR   := ./extensions/$(ORCA_PUBSUB_NAME)
+ORCA_PUBSUB_DIR   := $(ORCA_SW_DIR)/libs/$(ORCA_PUBSUB_NAME)
 ORCA_PUBSUB_SRC   := $(ORCA_PUBSUB_DIR)/src
 ORCA_PUBSUB_INC   := $(ORCA_PUBSUB_DIR)/include
-ORCA_PUBSUB_LIB   := ext-$(ORCA_PUBSUB_NAME).a
+ORCA_PUBSUB_LIB   := lib-$(ORCA_PUBSUB_NAME).a
 
 INC_DIRS += -I$(ORCA_PUBSUB_INC)
 

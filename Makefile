@@ -23,8 +23,8 @@ CXXFLAGS += $(COMPLINE)
 
 #compile only the requested tasks 
 $(foreach module,$(ORCA_APPLICATIONS),$(eval include applications/$(module)/app.mak))
-#compile only the requested extensions 
-$(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak))
+#compile only the requested libraries 
+$(foreach module,$(ORCA_LIBS),$(eval include libs/$(module)/ext.mak))
 
 # get the OS depedent parameters. it also defines the OS_STATIC_LIB rule to compile the OS
 # this include needs to come after the app's include, otherwise it will not be possible to 
@@ -39,8 +39,8 @@ include $(ORCA_SIM_DIR)/platforms/$(ORCA_PLATFORM)/Configuration.mk
 
 # concat the required libs and apps to build the image 
 $(foreach module,$(ORCA_APPLICATIONS), $(eval APP_STATIC_LIBS := $(APP_STATIC_LIBS) app-$(module).a))
-$(foreach module,$(ORCA_EXTENSIONS),   $(eval EXT_STATIC_LIBS := $(EXT_STATIC_LIBS) ext-$(module).a))
-STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(EXT_STATIC_LIBS)
+$(foreach module,$(ORCA_LIBS),   $(eval LIB_STATIC_LIBS := $(LIB_STATIC_LIBS) lib-$(module).a))
+STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(LIB_STATIC_LIBS)
 
 # general rule to compile all .c software
 .c.o:
@@ -54,11 +54,11 @@ STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(EXT_STATIC_LIBS)
 .s.o:
 	$(Q)$(AS) -c $(ASMFLAGS) -o $@ $<
 
-ext: ext_banner $(EXT_STATIC_LIBS)
+lib: lib_banner $(LIB_STATIC_LIBS)
 
-ext_banner:
+lib_banner:
 	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m  Making Extensions ...           \e[0m"
+	@echo "$'\e[7m  Making Libraries ...           \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 	
 app: app_banner $(APP_STATIC_LIBS)
@@ -68,7 +68,7 @@ app_banner:
 	@echo "$'\e[7m  Making Applications ..          \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 
-$(IMAGE_NAME).bin: $(OS_STATIC_LIB) ext app
+$(IMAGE_NAME).bin: $(OS_STATIC_LIB) lib app
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Linking Software ...            \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
