@@ -13,6 +13,13 @@ $(error ERROR: this application requires the floating point support)
 endif
 endif
 
+ifeq ($(ORCA_OS), bare-metal/hf-riscv)
+# define/undefine this symbol to turn newlib on/off
+USE_LIBC = 1
+# define/undefine this symbol to turn cpp on/off
+#USE_CPP = 1
+endif
+
 INC_DIRS += -I$(APP_MNIST_INC)
  
 CFLAGS += 

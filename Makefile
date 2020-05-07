@@ -17,9 +17,6 @@ IMAGE_NAME = image
 all:  $(IMAGE_NAME).bin
 	@echo "done"
 
-# get the OS depedent parameters. it also defines the OS_STATIC_LIB rule to compile the OS
-include ./os/$(ORCA_OS)/Configuration.mk
-
 # include the definitions from the main Configuration.mk
 CFLAGS += $(COMPLINE)
 CXXFLAGS += $(COMPLINE)
@@ -28,6 +25,11 @@ CXXFLAGS += $(COMPLINE)
 $(foreach module,$(ORCA_APPLICATIONS),$(eval include applications/$(module)/app.mak))
 #compile only the requested extensions 
 $(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak))
+
+# get the OS depedent parameters. it also defines the OS_STATIC_LIB rule to compile the OS
+# this include needs to come after the app's include, otherwise it will not be possible to 
+# configure the OS's according to the app's needs. One would need to manually change the OS's configure
+include ./os/$(ORCA_OS)/Configuration.mk
 
 #phonies
 .PHONY: clean

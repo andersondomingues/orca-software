@@ -11,6 +11,13 @@ INC_DIRS += -I$(APP_MNIST_TWO_LAYERS_INC)
  
 CFLAGS += 
 
+ifeq ($(ORCA_OS), bare-metal/hf-riscv)
+# define/undefine this symbol to turn newlib on/off
+USE_LIBC = 1
+# define/undefine this symbol to turn cpp on/off
+#USE_CPP = 1
+endif
+
 # Update these lines with your source code
 APP_MNIST_TWO_LAYERS_SRCS := $(wildcard $(APP_MNIST_TWO_LAYERS_SRC)/*.c)
 APP_MNIST_TWO_LAYERS_OBJS :=  $(APP_MNIST_TWO_LAYERS_SRCS:.c=.o)

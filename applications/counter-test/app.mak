@@ -9,6 +9,13 @@ INC_DIRS += -I$(APP_COUNTER_TEST_INC)
 
 CFLAGS += 
 
+ifeq ($(ORCA_OS), bare-metal/hf-riscv)
+# define/undefine this symbol to turn newlib on/off
+USE_LIBC = 1
+# define/undefine this symbol to turn cpp on/off
+#USE_CPP = 1
+endif
+
 # Update these lines with your source code
 APP_COUNTER_TEST_SRCS := $(wildcard $(APP_COUNTER_TEST_SRC)/*.c)
 APP_COUNTER_TEST_OBJS :=  $(APP_COUNTER_TEST_SRCS:.c=.o)
