@@ -1,90 +1,72 @@
-#platform-specific configuration
+#main configuration file
 include Configuration.mk
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
 export Q := @
-# Do not print "Entering directory ...".
+# Do not print "Entering directory ...". 
 MAKEFLAGS += --no-print-directory
 endif
 
-#arch confs.
-ARCH = riscv/hf-riscv
+ORCA_SIM_DIR = ../orca-sim
+ORCA_SW_DIR = $(shell pwd)
+
 IMAGE_NAME = image
 
-#dir config.
-HFOS_DIR = hellfireos
-
-CPU_ARCH = \"$(ARCH)\"
-MAX_TASKS = 30
-MUTEX_TYPE = 0
-MEM_ALLOC = 3
-HEAP_SIZE = 500000
-FLOATING_POINT = 1
-#KERNEL_LOG = 2
-KERNEL_LOG = $(KERNEL_LOG_LEVEL)
-
-SRC_DIR = $(HFOS_DIR)
-
-# do not move this from here 
+# do not move this from here
 all:  $(IMAGE_NAME).bin
 	@echo "done"
 
-#includes for kernel parts
-include $(HFOS_DIR)/arch/$(ARCH)/arch.mak
-include $(HFOS_DIR)/lib/lib.mak
-include $(HFOS_DIR)/drivers/noc.mak
-include $(HFOS_DIR)/sys/kernel.mak
+# include the definitions from the main Configuration.mk
+CFLAGS += $(COMPLINE)
+CXXFLAGS += $(COMPLINE)
 
 #compile only the requested tasks 
 $(foreach module,$(ORCA_APPLICATIONS),$(eval include applications/$(module)/app.mak))
-#compile only the requested extensions 
-$(foreach module,$(ORCA_EXTENSIONS),$(eval include extensions/$(module)/ext.mak))
+#compile only the requested libraries 
+$(foreach module,$(ORCA_LIBS),$(eval include libs/$(module)/ext.mak))
+
+# get the OS depedent parameters. it also defines the OS_STATIC_LIB rule to compile the OS
+# this include needs to come after the app's include, otherwise it will not be possible to 
+# configure the OS's according to the app's needs. One would need to manually change the OS's configure
+include ./os/$(ORCA_OS)/Configuration.mk
 
 #phonies
 .PHONY: clean
 
-# common definition to all software modules
-INC_DIRS += -I $(HFOS_DIR)/lib/include \
-			-I $(HFOS_DIR)/sys/include \
-			-I $(HFOS_DIR)/drivers/noc/include 
+# get the platform depedent parameters. 
+include $(ORCA_SIM_DIR)/platforms/$(ORCA_PLATFORM)/Configuration.mk
+# get memory mapped IO used in the platform to use the same in the sw
+INC_DIRS += -I$(ORCA_SIM_DIR)/platforms/$(ORCA_PLATFORM)/include
+# include the definitions from the main Configuration.mk
+CFLAGS += $(PLAT_COMPLINE) $(MODELS_COMPLINE) 
+CXXFLAGS += $(PLAT_COMPLINE) $(MODELS_COMPLINE) 
 
-NOC_FLAGS = -DNOC_INTERCONNECT -DNOC_PACKET_SIZE=64 -DNOC_PACKET_SLOTS=64 \
-	    -DNOC_WIDTH=$(ORCA_NOC_WIDTH) -DNOC_HEIGHT=$(ORCA_NOC_HEIGHT)
+# get the models depedent parameters. 
+include $(ORCA_SIM_DIR)/models/Configuration.mk
 
-CFLAGS += -DCPU_ARCH=$(CPU_ARCH) \
-	-DMAX_TASKS=$(MAX_TASKS) -DMEM_ALLOC=$(MEM_ALLOC) \
-	-DHEAP_SIZE=$(HEAP_SIZE) -DMUTEX_TYPE=$(MUTEX_TYPE) \
-	-DFLOATING_POINT=$(FLOATING_POINT) \
-	-DKERNEL_LOG=$(KERNEL_LOG) \
-	$(COMPLINE) \
-	$(NOC_FLAGS)
-
-# concat the required libs to build the image 
+# concat the required libs and apps to build the image 
 $(foreach module,$(ORCA_APPLICATIONS), $(eval APP_STATIC_LIBS := $(APP_STATIC_LIBS) app-$(module).a))
-$(foreach module,$(ORCA_EXTENSIONS),   $(eval EXT_STATIC_LIBS := $(EXT_STATIC_LIBS) ext-$(module).a))
-OS_STATIC_LIBS := hellfire-os.a
-STATIC_LIBS := $(OS_STATIC_LIBS) $(APP_STATIC_LIBS) $(EXT_STATIC_LIBS)
-
-$(OS_STATIC_LIBS):
-	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m  Making Kernel ...               \e[0m"
-	@echo "$'\e[7m==================================\e[0m"
-	$(Q)make hal
-	$(Q)make libc
-	$(Q)make noc
-	$(Q)make kernel 
-	$(Q)$(AR) rcs hellfire-os.a *.o
+$(foreach module,$(ORCA_LIBS),   $(eval LIB_STATIC_LIBS := $(LIB_STATIC_LIBS) lib-$(module).a))
+STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(LIB_STATIC_LIBS)
 
 # general rule to compile all .c software
 .c.o:
-	$(Q)$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
 
-ext: ext_banner $(EXT_STATIC_LIBS)
+# general rule to compile all .cpp software
+.cpp.o:
+	$(Q)$(CPP) -c $(CXXFLAGS) -o $@ $<
 
-ext_banner:
+# general rule to compile all .s software
+.s.o:
+	$(Q)$(AS) -c $(ASMFLAGS) -o $@ $<
+
+lib: lib_banner $(LIB_STATIC_LIBS)
+
+lib_banner:
 	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m  Making Extensions ...           \e[0m"
+	@echo "$'\e[7m  Making Libraries ...           \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 	
 app: app_banner $(APP_STATIC_LIBS)
@@ -94,11 +76,11 @@ app_banner:
 	@echo "$'\e[7m  Making Applications ..          \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
 
-$(IMAGE_NAME).bin: $(OS_STATIC_LIBS) ext app ./Configuration.mk
+$(IMAGE_NAME).bin: $(OS_STATIC_LIB) lib app
 	@echo "$'\e[7m==================================\e[0m"
 	@echo "$'\e[7m  Linking Software ...            \e[0m"
 	@echo "$'\e[7m==================================\e[0m"
-	$(Q)$(LD) --start-group *.a --end-group $(LDFLAGS) -T$(LINKER_SCRIPT) -o $(IMAGE_NAME).elf 
+	$(Q)$(LD) $(OS_OBJS) --start-group *.a --end-group $(LDFLAGS) -T$(LINKER_SCRIPT) -o $(IMAGE_NAME).elf 
 	$(Q)$(DUMP) --disassemble --reloc $(IMAGE_NAME).elf > $(IMAGE_NAME).lst
 	$(Q)$(DUMP) -h $(IMAGE_NAME).elf > $(IMAGE_NAME).sec
 	$(Q)$(DUMP) -s $(IMAGE_NAME).elf > $(IMAGE_NAME).cnt

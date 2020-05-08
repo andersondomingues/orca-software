@@ -1,0 +1,102 @@
+# concat the required libs to build the image 
+include Makefile-Orca-App
+
+# set these variable accordingly
+ORCA_SIM_DIR = /home/lsa/repos/anderson/orca-sim
+ORCA_SW_DIR = /home/lsa/repos/anderson/orca-software-tools/
+
+# Be silent per default, but 'make V=1' will show all compiler calls.
+ifneq ($(V),1)
+export Q := @
+# Do not print "Entering directory ...".
+MAKEFLAGS += --no-print-directory
+endif
+
+IMAGE_NAME = image
+APP_STATIC_LIBS = app-$(APP_NAME).a
+
+# Software libs (experimental)
+#ORCA_LIBS := orca-core orca-pubsub orca-monitoring 
+ORCA_LIBS := orca-monitoring 
+
+# part of the software, like the device drivers, might know plataform-specific details to parametrize the software.
+# one example is the NoC driver and the orca-lib-client. Both of them require details about the Hw NoC, the size of the MpSoC, etc. 
+# ORCA_PLATFORM := (orca-mpsoc | single-core | single-core-nn)
+ORCA_PLATFORM := single-core
+
+# select among the supported OS
+#ORCA_OS := (bare-metal/hf-riscv | hellfireos)
+ORCA_OS := bare-metal/hf-riscv
+
+
+# do not move this from here
+all:  $(IMAGE_NAME).bin
+	@echo "done"
+
+# get the OS depedent parameters. it also defines the OS_STATIC_LIB rule to compile the OS
+include $(ORCA_SW_DIR)/os/$(ORCA_OS)/Configuration.mk
+
+# include the definitions from the main Configuration.mk
+CFLAGS += $(COMPLINE)
+CXXFLAGS += $(COMPLINE)
+
+#compile only the requested libs 
+$(foreach module,$(ORCA_LIBS),$(eval include $(ORCA_SW_DIR)/libs/$(module)/ext.mak))
+
+#phonies
+.PHONY: clean
+
+# get the platform depedent parameters. 
+include $(ORCA_SIM_DIR)/platforms/$(ORCA_PLATFORM)/Configuration.mk
+
+$(foreach module,$(ORCA_LIBS),   $(eval LIB_STATIC_LIBS := $(LIB_STATIC_LIBS) lib-$(module).a))
+STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(LIB_STATIC_LIBS)
+
+# general rule to compile all .c software
+.c.o:
+	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
+
+# general rule to compile all .cpp software
+.cpp.o:
+	$(Q)$(CPP) -c $(CXXFLAGS) -o $@ $<
+
+# general rule to compile all .s software
+.s.o:
+	$(Q)$(AS) -c $(ASMFLAGS) -o $@ $<
+
+lib: lib_banner $(LIB_STATIC_LIBS)
+
+lib_banner:
+	@echo "$'\e[7m==================================\e[0m"
+	@echo "$'\e[7m  Making LIBS ...                 \e[0m"
+	@echo "$'\e[7m==================================\e[0m"
+	
+app: app_banner $(APP_STATIC_LIBS)
+
+app_banner:
+	@echo "$'\e[7m==================================\e[0m"
+	@echo "$'\e[7m  Making Applications ..          \e[0m"
+	@echo "$'\e[7m==================================\e[0m"
+
+$(IMAGE_NAME).bin: $(OS_STATIC_LIB) lib app
+	@echo "$'\e[7m==================================\e[0m"
+	@echo "$'\e[7m  Linking Software ...            \e[0m"
+	@echo "$'\e[7m==================================\e[0m"
+	$(Q)$(LD) $(OS_OBJS) --start-group *.a --end-group $(LDFLAGS) -T$(LINKER_SCRIPT) -o $(IMAGE_NAME).elf 
+	$(Q)$(DUMP) --disassemble --reloc $(IMAGE_NAME).elf > $(IMAGE_NAME).lst
+	$(Q)$(DUMP) -h $(IMAGE_NAME).elf > $(IMAGE_NAME).sec
+	$(Q)$(DUMP) -s $(IMAGE_NAME).elf > $(IMAGE_NAME).cnt
+	$(Q)$(OBJ) -O binary $(IMAGE_NAME).elf $(IMAGE_NAME).bin
+	$(Q)$(SIZE) $(IMAGE_NAME).elf
+	$(Q)hexdump -v -e '4/1 "%02x" "\n"' $(IMAGE_NAME).bin > $(IMAGE_NAME).txt
+
+clean:
+	@echo "$'\e[7m==================================\e[0m"
+	@echo "$'\e[7m          Cleaning up...          \e[0m"
+	@echo "$'\e[7m==================================\e[0m"
+	$(Q)rm -rf *.o *~ *.elf *.bin *.cnt *.lst *.sec *.txt *.a
+	$(Q)-find . -type f -name '*.su' -delete
+	$(Q)-find . -type f -name '*.o' -delete
+	$(Q)-find . -type f -name '*.a' -delete
+	$(Q)-find . -type f -name '$(IMAGE_NAME).*' -delete
+

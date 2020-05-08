@@ -20,7 +20,21 @@
 #ifndef _MNIST_H
 #define _MNIST_H
 
+#ifdef HELLFIREOS
 #include <hellfire.h>
+//#include <noc.h>
+#endif
+#ifdef BARE_METAL
+#include <stdio.h>
+#endif
+
+#ifndef HFRISCV_ENABLE_COUNTERS
+#error "This application requires HFRISC_ENABLE_COUNTERS to be set."
+#endif
+
+#ifndef MEMORY_ENABLE_COUNTERS
+#error "This application requires MEMORY_ENABLE_COUNTERS to be set."
+#endif
 
 void mnist(void); // __attribute__((section (".tasks")));
 

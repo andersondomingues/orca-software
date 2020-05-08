@@ -5,6 +5,10 @@ APP_MNIST_EXT_VET_SEQ_MULT_SRC   := $(APP_MNIST_EXT_VET_SEQ_MULT_DIR)/src
 APP_MNIST_EXT_VET_SEQ_MULT_INC   := $(APP_MNIST_EXT_VET_SEQ_MULT_DIR)/include
 APP_MNIST_EXT_VET_SEQ_MULT_LIB   := app-$(APP_MNIST_EXT_VET_SEQ_MULT_NAME).a
 
+ifneq ($(ORCA_PLATFORM), single-core-nn)
+$(error ERROR: this application requires the single-core-nn platform)
+endif
+
 INC_DIRS += -I$(APP_MNIST_EXT_VET_SEQ_MULT_INC)
 
 CFLAGS += 

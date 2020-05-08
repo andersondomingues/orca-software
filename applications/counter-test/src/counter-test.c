@@ -24,11 +24,12 @@ void counter_test(void){
 
     for(;;){
 
+	#ifdef MEMORY_ENABLE_COUNTERS
         printf("MEM0: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
 		printf("MEM1: writes=%u, reads=%u\n", *M1_COUNTER_STORE, *M1_COUNTER_LOAD);
 		printf("MEM2: writes=%u, reads=%u\n", *M2_COUNTER_STORE, *M2_COUNTER_LOAD);
 		printf("---\n");
-	
+	#endif
 		printf("CPU: arith=%u, logical=%u\n",   *CPU_COUNTER_ARITH, *CPU_COUNTER_LOGICAL);
 		printf("CPU: shift=%u, branches=%u\n",  *CPU_COUNTER_SHIFT, *CPU_COUNTER_BRANCHES);
 		printf("CPU: jumps=%u, loadstore=%u\n", *CPU_COUNTER_JUMPS, *CPU_COUNTER_LOADSTORE);
@@ -36,10 +37,19 @@ void counter_test(void){
 		printf("CPU: hosttime=%u\n", *CPU_COUNTER_HOSTTIME);
 		printf("---\n");
 	
+	#ifdef ROUTER_ENABLE_COUNTERS
 		printf("ROUTER: active=%u\n", *ROUTER_COUNTER_ACTIVE);
 		printf("---\n");
+	#endif
 	}
 
 	//hf_kill(hf_selfid());
 	//while(1);
 }
+
+
+#ifdef BARE_METAL
+	void main(){
+		counter_test();
+	}
+#endif

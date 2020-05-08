@@ -20,7 +20,24 @@
 #ifndef _ANN_H
 #define _ANN_H
 
+#ifdef HELLFIREOS
 #include <hellfire.h>
+//#include <noc.h>
+#endif
+#ifdef BARE_METAL
+#include <stdio.h>
+
+int32_t ftoa(float f, char *outbuf, int32_t precision);
+char *itoa(int32_t i, char *s, int32_t base);
+#endif
+
+#ifndef HFRISCV_ENABLE_COUNTERS
+#error "This application requires HFRISC_ENABLE_COUNTERS to be set."
+#endif
+
+#ifndef MEMORY_ENABLE_COUNTERS
+#error "This application requires MEMORY_ENABLE_COUNTERS to be set."
+#endif
 
 void ann(void); // __attribute__((section (".tasks")));
 

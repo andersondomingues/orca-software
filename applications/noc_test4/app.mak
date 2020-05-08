@@ -5,6 +5,10 @@ APP_NOCTEST4_SRC   := $(APP_NOCTEST4_DIR)/src
 APP_NOCTEST4_INC   := $(APP_NOCTEST4_DIR)/include
 APP_NOCTEST4_LIB   := app-$(APP_NOCTEST4_NAME).a 
 
+ifneq ($(ORCA_PLATFORM), orca-mpsoc)
+$(error ERROR: this application requires the orca-mpsoc platform)
+endif
+
 INC_DIRS += -I$(APP_NOCTEST4_INC)
 
 CFLAGS += 
@@ -14,4 +18,4 @@ APP_NOCTEST4_SRCS := $(wildcard $(APP_NOCTEST4_SRC)/*.c)
 APP_NOCTEST4_OBJS :=  $(APP_NOCTEST4_SRCS:.c=.o)
 
 $(APP_NOCTEST4_LIB) : $(APP_NOCTEST4_OBJS)
-	$(Q)$(AR) rcs $(APP_NOCTEST4_LIB) $(APP_NOCTEST4_OBJS) 
+	$(Q)$(AR) rcs $@ $^

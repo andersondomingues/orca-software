@@ -25,19 +25,6 @@
 #include "mnist-ext-mult-dma.h"
 #include "orca-hardware-counters.h"
 
-// MMIO for the DMA-based SIMD MACs
-#define SIGNAL_CPU_STALL    (volatile uint8_t*)0x40412000  // 8 bits
-#define SIGNAL_DMA_PROG     (volatile uint8_t*)0x40412002
-
-#define DMA_BURST_SIZE	  (volatile uint32_t*)0x40412004  // 32 bits 
-#define DMA_NN_SIZE  	  (volatile uint32_t*)0x40412008
-#define DMA_OUT_SIZE  	  (volatile uint32_t*)0x4041200C
-#define DMA_MAC_OUT_ARRAY (volatile float*)   0x40412010
-// DMA_MAC_OUT_ARRAY0 		(volatile float*) 0x40412010
-// DMA_MAC_OUT_ARRAY1 		(volatile float*) 0x40412014
-//...  
-//DMA_MAC_OUT_ARRAY31		(volatile float*) 0x40412010 + (0x20 * 4) -1 
-
 // NN hw parameters
 #define TOTAL_NN_MEM_SIZE   	4 * 1024 * 1024 					///< this is the maximum memory address space to be used for operands of the MACs 
 #define SIMD_SIZE     			32   								///< max number of parallel MAC operations
@@ -258,7 +245,9 @@ void mnist_ext_mult_dma (void) {
 	}
 
 	printf("---\n");
-	printf("MEM: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
+#ifdef MEMORY_ENABLE_COUNTERS
+	printf("MEM0: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
+#endif
 	printf("CPU: arith=%u, logical=%u\n",   *CPU_COUNTER_ARITH, *CPU_COUNTER_LOGICAL);
 	printf("CPU: shift=%u, branches=%u\n",  *CPU_COUNTER_SHIFT, *CPU_COUNTER_BRANCHES);
 	printf("CPU: jumps=%u, loadstore=%u\n", *CPU_COUNTER_JUMPS, *CPU_COUNTER_LOADSTORE);
@@ -266,5 +255,13 @@ void mnist_ext_mult_dma (void) {
 	printf("CPU: hosttime=%u\n", *CPU_COUNTER_HOSTTIME);
 	printf("---\n");
 
+#ifdef HELLFIREOS
 	hf_kill(hf_selfid());
+#endif
 }
+
+#ifdef BARE_METAL
+	void main(){
+		mnist_ext_mult_dma();
+	}
+#endif

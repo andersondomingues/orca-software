@@ -20,11 +20,30 @@
 #ifndef _EXAMPLE_COUNTERS_H
 #define _EXAMPLE_COUNTERS_H
 
+#ifdef HELLFIREOS
 #include <hellfire.h>
-#include <noc.h>
+//#include <noc.h>
+#endif
+#ifdef BARE_METAL
+#include <stdio.h>
+#endif
 
 #include "orca-hardware-counters.h"
 
+/* TODO include apps requirements check, such as ORCA_OS and ORCA_PLATFORM
+#if ORCA_PLATFORM != "orca-mpsoc"
+#error "This application requires orca-mpsoc platform."
+#endif
+
+ifneq ($(ORCA_PLATFORM), orca-mpsoc)
+$(error ERROR: ORCA_PLATFORM = $(ORCA_PLATFORM) is not compatible with orca-lib-client)
+endif
+*/
+/*
+#ifndef HELLFIREOS
+#error "This application requires helfireos."
+#endif
+*/
 #ifndef HFRISCV_ENABLE_COUNTERS
 #error "This application requires HFRISC_ENABLE_COUNTERS to be set."
 #endif
@@ -36,6 +55,7 @@
 #ifndef ROUTER_ENABLE_COUNTERS
 #error "This application requires ROUTER_ENABLE_COUNTERS to be set."
 #endif
+
 
 void counter_test(void); // __attribute__((section (".tasks")));
 
