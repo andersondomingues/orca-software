@@ -3,11 +3,11 @@
 # be included in compilation unless you edit the file 
 #          os/hellfireos/orca-core/src/orca-core.cpp,
 # where you should simple of tasks in each of the cores. 
-ORCA_APPLICATIONS := simple
+ORCA_APPLICATIONS := mnist
 #ORCA_APPLICATIONS := producer-consumer-pubsub producer-consumer app-spawner app-bloater deadline-monitor
 
 # Software libraries (experimental)
-#ORCA_LIBS := orca-core orca-pubsub orca-monitoring hf-printf
+#ORCA_LIBS := orca-pubsub orca-monitoring hf-printf
 ORCA_LIBS := orca-monitoring 
 
 # part of the software, like the device drivers, might know plataform-specific details to parametrize the software.

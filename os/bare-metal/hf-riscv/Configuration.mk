@@ -25,8 +25,8 @@ OBJ   = riscv64-unknown-elf-objcopy
 SIZE  = riscv64-unknown-elf-size
 
 # issue an error if trying to compile with an incompatible platform.
-# bare metal apps only work with single-core platform
-ifneq ($(ORCA_PLATFORM), single-core)
+# bare metal apps do not work yet with the orca-mpsoc platform
+ifeq ($(ORCA_PLATFORM), orca-mpsoc)
 $(error ERROR: ORCA_PLATFORM = $(ORCA_PLATFORM) is not compatible with bare metal apps)
 endif
 

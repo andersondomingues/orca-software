@@ -47,7 +47,7 @@ endif
 #ifndef HFRISCV_ENABLE_COUNTERS
 #error "This application requires HFRISC_ENABLE_COUNTERS to be set."
 #endif
-/*
+
 #ifndef MEMORY_ENABLE_COUNTERS
 #error "This application requires MEMORY_ENABLE_COUNTERS to be set."
 #endif
@@ -55,7 +55,7 @@ endif
 #ifndef ROUTER_ENABLE_COUNTERS
 #error "This application requires ROUTER_ENABLE_COUNTERS to be set."
 #endif
-*/
+
 
 void counter_test(void); // __attribute__((section (".tasks")));
 

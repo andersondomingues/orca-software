@@ -2,8 +2,8 @@
 #define __ORCA_LIB_H
 
 #include "hellfire.h"
-
-#define MAGIC_TILE_ID       0x40411000  
+// the memory map is defined in the platform design, in the orca-sim repo.
+#include "MemoryMap.h"
 
 //apps' entry point
 extern void app_main(void);

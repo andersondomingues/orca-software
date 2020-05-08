@@ -28,6 +28,14 @@
 #include <stdio.h>
 #endif
 
+#ifndef HFRISCV_ENABLE_COUNTERS
+#error "This application requires HFRISC_ENABLE_COUNTERS to be set."
+#endif
+
+#ifndef MEMORY_ENABLE_COUNTERS
+#error "This application requires MEMORY_ENABLE_COUNTERS to be set."
+#endif
+
 void mnist_two_layers(void); // __attribute__((section (".tasks")));
 
 #endif /* _MORM_SP_H */

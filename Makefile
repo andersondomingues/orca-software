@@ -36,6 +36,14 @@ include ./os/$(ORCA_OS)/Configuration.mk
 
 # get the platform depedent parameters. 
 include $(ORCA_SIM_DIR)/platforms/$(ORCA_PLATFORM)/Configuration.mk
+# get memory mapped IO used in the platform to use the same in the sw
+INC_DIRS += -I$(ORCA_SIM_DIR)/platforms/$(ORCA_PLATFORM)/include
+# include the definitions from the main Configuration.mk
+CFLAGS += $(PLAT_COMPLINE) $(MODELS_COMPLINE) 
+CXXFLAGS += $(PLAT_COMPLINE) $(MODELS_COMPLINE) 
+
+# get the models depedent parameters. 
+include $(ORCA_SIM_DIR)/models/Configuration.mk
 
 # concat the required libs and apps to build the image 
 $(foreach module,$(ORCA_APPLICATIONS), $(eval APP_STATIC_LIBS := $(APP_STATIC_LIBS) app-$(module).a))

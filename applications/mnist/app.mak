@@ -8,9 +8,8 @@ APP_MNIST_LIB   := app-$(APP_MNIST_NAME).a
 #$(info $$PWD = [$(shell pwd)])
 
 ifeq ($(ORCA_OS), hellfireos)
-ifneq ($(FLOATING_POINT), 1)
-$(error ERROR: this application requires the floating point support)
-endif
+# set the FP support in hellfireOS
+FLOATING_POINT = 1
 endif
 
 ifeq ($(ORCA_OS), bare-metal/hf-riscv)

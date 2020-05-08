@@ -27,15 +27,6 @@ int8_t *itoa(int32_t i, int8_t *s, int32_t base);
 #endif
 
 
-// SIMD floating point multiplier, capable of up to 16 mult in 'parallel'
-#define SIGNAL_DMA_PROG     (volatile uint8_t*)0x40410002
-
-// jumping to 0x404120xx, otherwise it wont fit before the memory counters
-#define DMA_BURST_SIZE       (volatile uint32_t*)0x40412000  // 32 bits 
-#define DMA_WEIGHT_MEM_ADDR  (volatile uint32_t*)0x40412004
-#define DMA_INPUT_MEM_ADDR   (volatile uint32_t*)0x40412008  
-#define DMA_MAC_OUT          (volatile uint32_t*)0x4041200C
-
 float SetDMA(uint32_t size, float* input_base_addr, float* weight_base_addr){
 	volatile uint32_t * burst_size = DMA_BURST_SIZE;
 	volatile uint32_t * iaddr = DMA_INPUT_MEM_ADDR;

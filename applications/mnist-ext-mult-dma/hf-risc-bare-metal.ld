@@ -118,23 +118,27 @@ SECTIONS
 		__heap_end = .;
 	} > ram
 
-    	/* stack section */
-	/*
-	. = __stacktop - STACK_SIZE;
-	_sstack = .;
-	. = . + STACK_SIZE;
-	_estack = .;
-	_stack = .;
-	*/
-
 	/*stack starts at the end of the memory and it grows towards the heap ... possible silient stack overflow*/
-	.stack ORIGIN(ram) + LENGTH(ram) - STACK_SIZE :
+	.stack 0x40400000 :
 	{
 	PROVIDE( _sstack = . );
 	. = STACK_SIZE;
 	PROVIDE( _stack = . );
 	} >ram
 
+    /* placing my named section at given address: */
+    /*https://mcuoneclipse.com/2012/11/01/defining-variables-at-absolute-addresses-with-gcc/*/
+	/*2Mbytes for weights*/
+    .weight_mem 0x40500000 :
+    {
+        KEEP(*(.weight_mem)) /* keep my variable even if not referenced */
+    } > ram
+ 
+	/*2Mbytes for inputs*/
+    .input_mem 0x40700000 :
+    {
+        KEEP(*(.input_mem)) /* keep my variable even if not referenced */
+    } > ram
 
 	_text_size = SIZEOF(.text);
 	_bss_size = SIZEOF(.bss);

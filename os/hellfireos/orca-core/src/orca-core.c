@@ -32,6 +32,7 @@
 #include "../../../applications/app-bloater/include/app-bloater.h"
 #include "../../../applications/deadline-monitor/include/deadline-monitor.h"
 */
+//#include "../../../applications/mnist-ext-mult-dma/include/mnist-ext-mult-dma.h"
 #include "../../../applications/mnist/include/mnist.h"
 
 //Task mapping routine and entry-point. Please note that 
@@ -42,6 +43,7 @@
 void app_main(void)
 {   
 
+	//hf_spawn(mnist_ext_mult_dma, 5, 4, 5, "mnist-ext-mult-dma", 256*1024);   // 4/5%
 	hf_spawn(mnist, 5, 4, 5, "mnist", 256*1024);   // 4/5%
 	//hf_spawn(simple, 5, 4, 5, "simple", 1024);   // 4/5%
 	//hf_spawn(cpp_example, 5, 4, 5, "cpp_example", 1024);   // 4/5%
