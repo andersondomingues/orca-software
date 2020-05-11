@@ -25,8 +25,8 @@ OBJ = mips-elf-objcopy
 SIZE = mips-elf-size
 
 hal: noc
-	$(AS) $(ASFLAGS) -o crt0.o $(ARCH_DIR)/boot/crt0.s
-	$(CC) $(CFLAGS) \
+	$(Q)$(AS) $(ASFLAGS) -o crt0.o $(ARCH_DIR)/boot/crt0.s
+	$(Q)$(CC) $(CFLAGS) \
 		$(ARCH_DIR)/drivers/interrupt.c \
 		$(ARCH_DIR)/drivers/hal.c \
 		$(ARCH_DIR)/drivers/ni.c

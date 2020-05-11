@@ -1,5 +1,5 @@
 spi:
-	$(CC) $(CFLAGS) \
+	$(Q)$(CC) $(CFLAGS) \
 		$(SRC_DIR)/drivers/spi/spi.c \
 		$(SRC_DIR)/drivers/spi/eeprom25lcxx.c \
 		$(SRC_DIR)/drivers/spi/sram23lcxx.c \
