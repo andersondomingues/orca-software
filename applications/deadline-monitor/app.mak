@@ -5,6 +5,10 @@ APP_DEADLINE_MONITOR_SRC   := $(APP_DEADLINE_MONITOR_DIR)/src
 APP_DEADLINE_MONITOR_INC   := $(APP_DEADLINE_MONITOR_DIR)/include
 APP_DEADLINE_MONITOR_LIB   := app-$(APP_DEADLINE_MONITOR_NAME).a
 
+ifneq ($(ORCA_PLATFORM), orca-mpsoc)
+$(error ERROR: this application requires the orca-mpsoc platform)
+endif
+
 INC_DIRS += -I$(APP_DEADLINE_MONITOR_INC)
 
 CFLAGS += 

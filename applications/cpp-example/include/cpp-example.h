@@ -20,9 +20,19 @@
 #ifndef _CPP_EXAMPLE_H
 #define _CPP_EXAMPLE_H
 
-#include <hellfire.h>
-//#include <stdio.h>
 #include <iostream>
+
+#ifdef HELLFIREOS
+#include <hellfire.h>
+#endif
+
+#ifndef HFRISCV_ENABLE_COUNTERS
+#error "This application requires HFRISC_ENABLE_COUNTERS to be set."
+#endif
+
+#ifndef MEMORY_ENABLE_COUNTERS
+#error "This application requires MEMORY_ENABLE_COUNTERS to be set."
+#endif
 
 class ExampleBaseClass
 {

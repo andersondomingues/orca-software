@@ -1,5 +1,11 @@
 include ../../Configuration.mk
 
+# issue an error if trying to compile with an incompatible platform.
+# orca-mpsoc has NoC defines used by this software
+ifneq ($(ORCA_PLATFORM), orca-mpsoc)
+$(error ERROR: ORCA_PLATFORM = $(ORCA_PLATFORM) is not compatible with orca-lib-client)
+endif
+
 LIBNAME = liborca-client.a
 SRCDIR  = ./src
 BINDIR  = ./bin

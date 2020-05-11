@@ -5,6 +5,10 @@ APP_SPAWNER_SRC   := $(APP_SPAWNER_DIR)/src
 APP_SPAWNER_INC   := $(APP_SPAWNER_DIR)/include
 APP_SPAWNER_LIB   := app-$(APP_SPAWNER_NAME).a
 
+ifneq ($(ORCA_PLATFORM), orca-mpsoc)
+$(error ERROR: this application requires the orca-mpsoc platform)
+endif
+
 INC_DIRS += -I$(APP_SPAWNER_INC)
 
 CFLAGS += 
@@ -14,5 +18,4 @@ APP_SPAWNER_SRCS := $(wildcard $(APP_SPAWNER_SRC)/*.c)
 APP_SPAWNER_OBJS :=  $(APP_SPAWNER_SRCS:.c=.o)
 
 $(APP_SPAWNER_LIB) : $(APP_SPAWNER_OBJS)
-	$(Q)$(AR) rcs $(APP_SPAWNER_LIB) $(APP_SPAWNER_OBJS) 
-
+	$(Q)$(AR) rcs $@ $^
