@@ -3,8 +3,7 @@
 # be included in compilation unless you edit the file 
 #          os/hellfireos/orca-core/src/orca-core.cpp,
 # where you should simple of tasks in each of the cores. 
-ORCA_APPLICATIONS := mnist
-#ORCA_APPLICATIONS := producer-consumer-pubsub producer-consumer app-spawner app-bloater deadline-monitor
+ORCA_APPLICATIONS := counter-test
 
 # Software libraries (experimental)
 #ORCA_LIBS := orca-pubsub orca-monitoring hf-printf
@@ -19,34 +18,7 @@ ORCA_PLATFORM := single-core
 #ORCA_OS := (bare-metal/hf-riscv | hellfireos)
 ORCA_OS := bare-metal/hf-riscv
 
-# ==================================================================[ ORCA ]
-# Number of cycles before calling the frequency analisys tool. Shorter
-# values may compromise the performance of the simulation, while higher
-# values may provide inaccurate measurements of the achieved frequency.
-ORCA_EPOCH_LENGTH  := 10000000
-#ORCA_EPOCH_LENGTH  := 50000000
-
-# Number of pulses to simulate. Set to INF to simulate indefinitely. 
-ORCA_EPOCHS_TO_SIM := INF
-#ORCA_EPOCHS_TO_SIM := 3
-
-# ========================================================================
-# GENERATION OF COMPILATION PARAMETERS STARTS HERE.
-# DO NOT MODIFY BELOW THIS LINE!
-# ========================================================================
-
-#ORCA parameters
-ifneq ($(ORCA_EPOCHS_TO_SIM), INF)
-	COMPLINE := $(COMPLINE) -DORCA_EPOCHS_TO_SIM=$(ORCA_EPOCHS_TO_SIM)
-endif
-
-COMPLINE := $(COMPLINE) -DORCA_EPOCH_LENGTH=$(ORCA_EPOCH_LENGTH)
-
-ifeq ($(ORCA_ENABLE_MULTITHREADING), YES)
-	COMPLINE := $(COMPLINE) -DORCA_ENABLE_MULTITHREADING
-endif 
-
-export COMPLINE
 export ORCA_APPLICATIONS
-export ORCA_OS
+export ORCA_LIBS
 export ORCA_PLATFORM
+export ORCA_OS
