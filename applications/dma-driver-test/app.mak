@@ -1,0 +1,17 @@
+# Do not modify the lines below
+DMA_DRIVER_TEST_NAME := dma-driver-test
+DMA_DRIVER_TEST_DIR  := ./applications/$(DMA_DRIVER_TEST_NAME)
+DMA_DRIVER_TEST_SRC  := $(DMA_DRIVER_TEST_DIR)/src
+DMA_DRIVER_TEST_INC  := $(DMA_DRIVER_TEST_DIR)/include
+DMA_DRIVER_TEST_LIB  := app-$(DMA_DRIVER_TEST_NAME).a
+
+INC_DIRS += -I$(DMA_DRIVER_TEST_INC)
+
+CFLAGS += 
+
+# Update these lines with your source code
+DMA_DRVER_TEST_SRCS := $(wildcard $(DMA_DRIVER_TEST_SRC)/*.c)
+DMA_DRVER_TEST_OBJS :=  $(DMA_DRVER_TEST_SRCS:.c=.o)
+
+$(DMA_DRIVER_TEST_LIB) : $(DMA_DRVER_TEST_OBJS)
+	$(Q)$(AR) rcs $(DMA_DRIVER_TEST_LIB) $(DMA_DRVER_TEST_OBJS) 
