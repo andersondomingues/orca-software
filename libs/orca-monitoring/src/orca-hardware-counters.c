@@ -3,17 +3,23 @@
 #ifdef MEMORY_ENABLE_COUNTERS
 volatile uint32_t* M0_COUNTER_STORE = (volatile uint32_t*) M0_COUNTER_STORE_ADDR;
 volatile uint32_t* M0_COUNTER_LOAD  = (volatile uint32_t*) M0_COUNTER_LOAD_ADDR;
+
+#ifdef NI_ENABLE_COUNTERS
 volatile uint32_t* M1_COUNTER_STORE = (volatile uint32_t*) M1_COUNTER_STORE_ADDR;
 volatile uint32_t* M1_COUNTER_LOAD  = (volatile uint32_t*) M1_COUNTER_LOAD_ADDR;
 volatile uint32_t* M2_COUNTER_STORE = (volatile uint32_t*) M2_COUNTER_STORE_ADDR;
 volatile uint32_t* M2_COUNTER_LOAD  = (volatile uint32_t*) M2_COUNTER_LOAD_ADDR;
+#endif
 
 uint32_t GetCounter_M0_Stores(){ return *M0_COUNTER_STORE; }
 uint32_t GetCounter_M0_Loads(){  return *M0_COUNTER_LOAD; }
+
+#ifdef NI_ENABLE_COUNTERS
 uint32_t GetCounter_M1_Stores(){ return *M1_COUNTER_STORE; }
 uint32_t GetCounter_M1_Loads(){  return *M1_COUNTER_LOAD; }
 uint32_t GetCounter_M2_Stores(){ return *M2_COUNTER_STORE; }
 uint32_t GetCounter_M2_Loads(){  return *M2_COUNTER_LOAD; }
+#endif
 
 #endif
 
@@ -40,9 +46,9 @@ uint32_t GetCounter_CPU_CyclesStall(){ return *CPU_COUNTER_CYCLES_STALL; }
 
 #endif
 
+//pog pra resolver o problema do manycore
 #ifdef ROUTER_ENABLE_COUNTERS
 volatile uint32_t* ROUTER_COUNTER_ACTIVE = (volatile uint32_t*) ROUTER_COUNTER_ACTIVE_ADDR;
 uint32_t GetCounter_ROUTER_Active(){ return *ROUTER_COUNTER_ACTIVE; }
 #endif
 
-//funcs

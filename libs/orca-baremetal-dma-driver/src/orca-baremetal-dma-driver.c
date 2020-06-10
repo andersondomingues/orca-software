@@ -24,6 +24,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
 ******************************************************************************/
 #include <orca-baremetal-dma-driver.h>
+#include <stdio.h>
 
 //cpu-specific signals
 volatile uint8_t* sig_stall = (volatile uint8_t*)SIGNAL_CPU_STALL;
@@ -53,6 +54,8 @@ int dma_recv_probe(){
 
 int dma_send_start(int x, int y, char* data_ptr, int size){
 
+
+
     uint16_t first_flit = (x << 4) & y;
     uint16_t second_flit = size;
 
@@ -64,6 +67,8 @@ int dma_send_start(int x, int y, char* data_ptr, int size){
     for(int i = 0; i < size; i++)
 		buffer[i + 4] = data_ptr[i];
 	
+	printf("sdsd %d\n", first_flit);
+
 	//wait until previous send to finish (if any)
 	while(*sig_send_status == 0x1);
 
@@ -85,7 +90,7 @@ int dma_send_start(int x, int y, char* data_ptr, int size){
 	*sig_send = 0x0;
 	*sig_send = 0x0;
 	*sig_send = 0x0;
-	
+
 	return 0; //<<- no reason for failing
 }
 

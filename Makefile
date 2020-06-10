@@ -65,21 +65,21 @@ STATIC_LIBS := $(OS_STATIC_LIB) $(APP_STATIC_LIBS) $(LIB_STATIC_LIBS)
 lib: lib_banner $(LIB_STATIC_LIBS)
 
 lib_banner:
-	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m  Making Libraries ...           \e[0m"
-	@echo "$'\e[7m==================================\e[0m"
+	@echo "$'\033[7m==================================\033[0m"
+	@echo "$'\033[7m  Making Libraries ...            \033[0m"
+	@echo "$'\033[7m==================================\033[0m"
 	
 app: app_banner $(APP_STATIC_LIBS)
 
 app_banner:
-	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m  Making Applications ..          \e[0m"
-	@echo "$'\e[7m==================================\e[0m"
+	@echo "$'\033[7m==================================\033[0m"
+	@echo "$'\033[7m  Making Applications ..          \033[0m"
+	@echo "$'\033[7m==================================\033[0m"
 
 $(IMAGE_NAME).bin: $(OS_STATIC_LIB) lib app
-	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m  Linking Software ...            \e[0m"
-	@echo "$'\e[7m==================================\e[0m"
+	@echo "$'\033[7m==================================\033[0m"
+	@echo "$'\033[7m  Linking Software ...            \033[0m"
+	@echo "$'\033[7m==================================\033[0m"
 	$(Q)$(LD) $(OS_OBJS) --start-group *.a --end-group $(LDFLAGS) -T$(LINKER_SCRIPT) -o $(IMAGE_NAME).elf 
 	$(Q)$(DUMP) --disassemble --reloc $(IMAGE_NAME).elf > $(IMAGE_NAME).lst
 	$(Q)$(DUMP) -h $(IMAGE_NAME).elf > $(IMAGE_NAME).sec
@@ -89,9 +89,9 @@ $(IMAGE_NAME).bin: $(OS_STATIC_LIB) lib app
 	$(Q)hexdump -v -e '4/1 "%02x" "\n"' $(IMAGE_NAME).bin > $(IMAGE_NAME).txt
 
 clean:
-	@echo "$'\e[7m==================================\e[0m"
-	@echo "$'\e[7m          Cleaning up...          \e[0m"
-	@echo "$'\e[7m==================================\e[0m"
+	@echo "$'\033[7m==================================\033[0m"
+	@echo "$'\033[7m          Cleaning up...          \033[0m"
+	@echo "$'\033[7m==================================\033[0m"
 	$(Q)rm -rf *.o *~ *.elf *.bin *.cnt *.lst *.sec *.txt *.a
 	$(Q)-find . -type f -name '*.su' -delete
 	$(Q)-find . -type f -name '*.o' -delete

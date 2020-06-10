@@ -5,9 +5,16 @@ ORCA_BAREMETAL_DMA_DRIVER_SRC := $(ORCA_BAREMETAL_DMA_DRIVER_DIR)/src
 ORCA_BAREMETAL_DMA_DRIVER_INC := $(ORCA_BAREMETAL_DMA_DRIVER_DIR)/include
 ORCA_BAREMETAL_DMA_DRIVER_LIB := lib-$(ORCA_BAREMETAL_DMA_DRIVER_NAME).a
 
-INC_DIRS += -I$(ORCA_BAREMETAL_DMA_DRIVER_INC)
+INC_DIRS += -I$(ORCA_BAREMETAL_DMA_DRIVER_INC) 
 
 CFLAGS += 
+
+ifeq ($(ORCA_OS), bare-metal/hf-riscv)
+# define/undefine this symbol to turn newlib on/off
+USE_LIBC = 1
+# define/undefine this symbol to turn cpp on/off
+#USE_CPP = 1
+endif
 
 # Update these lines with your source code
 ORCA_BAREMETAL_DMA_DRIVER_SRCS := $(wildcard $(ORCA_BAREMETAL_DMA_DRIVER_SRC)/*.c)

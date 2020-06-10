@@ -16,17 +16,26 @@
 #ifdef MEMORY_ENABLE_COUNTERS
 extern volatile uint32_t* M0_COUNTER_STORE;
 extern volatile uint32_t* M0_COUNTER_LOAD;
-extern volatile uint32_t* M1_COUNTER_STORE;
-extern volatile uint32_t* M1_COUNTER_LOAD;
-extern volatile uint32_t* M2_COUNTER_STORE;
-extern volatile uint32_t* M2_COUNTER_LOAD;
 
+	#ifdef NI_ENABLE_COUNTERS
+	extern volatile uint32_t* M1_COUNTER_STORE;
+	extern volatile uint32_t* M1_COUNTER_LOAD;
+	extern volatile uint32_t* M2_COUNTER_STORE;
+	extern volatile uint32_t* M2_COUNTER_LOAD;
+	#endif
+
+#endif
+
+#ifdef MEMORY_ENABLE_COUNTERS
 uint32_t GetCounter_M0_Stores();
 uint32_t GetCounter_M0_Loads();
-uint32_t GetCounter_M1_Stores();
-uint32_t GetCounter_M1_Loads();
-uint32_t GetCounter_M2_Stores();
-uint32_t GetCounter_M2_Loads();
+
+	#ifdef NI_ENABLE_COUNTERS
+	uint32_t GetCounter_M1_Stores();
+	uint32_t GetCounter_M1_Loads();
+	uint32_t GetCounter_M2_Stores();
+	uint32_t GetCounter_M2_Loads();
+	#endif
 
 #endif
 
@@ -55,13 +64,8 @@ uint32_t GetCounter_CPU_CyclesStall();
 
 //0x403F15xx => router wires
 #ifdef ROUTER_ENABLE_COUNTERS
-
 extern volatile uint32_t* ROUTER_COUNTER_ACTIVE;
-
 uint32_t GetCounter_ROUTER_Active();
 #endif
-
-
-
 
 #endif /* __ORCA_HARDWARE_COUNTERS_H */
