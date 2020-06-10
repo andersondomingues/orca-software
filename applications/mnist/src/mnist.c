@@ -109,15 +109,23 @@ void mnist (void) {
 	}
 
 #ifdef MEMORY_ENABLE_COUNTERS
-	printf("MEM0: writes=%u, reads=%u\n", *M0_COUNTER_STORE, *M0_COUNTER_LOAD);
+	printf("MEM0: writes=%u, reads=%u\n", (int)GetCounter_M0_Stores(), (int)GetCounter_M0_Loads());
+
+	#ifdef NI_ENABLE_COUNTERS
+	printf("MEM1: writes=%u, reads=%u\n", (int)GetCounter_M1_Stores(), (int)GetCounter_M1_Loads());
+	printf("MEM2: writes=%u, reads=%u\n", (int)GetCounter_M2_Stores(), (int)GetCounter_M2_Loads());
+	#endif
+
 	printf("---\n");
 #endif
-	printf("CPU: arith=%u, logical=%u\n",   *CPU_COUNTER_ARITH, *CPU_COUNTER_LOGICAL);
-	printf("CPU: shift=%u, branches=%u\n",  *CPU_COUNTER_SHIFT, *CPU_COUNTER_BRANCHES);
-	printf("CPU: jumps=%u, loadstore=%u\n", *CPU_COUNTER_JUMPS, *CPU_COUNTER_LOADSTORE);
-	printf("CPU: cycles=%u, stalls=%u\n", *CPU_COUNTER_CYCLES_TOTAL, *CPU_COUNTER_CYCLES_STALL);	
-	printf("CPU: hosttime=%u\n", *CPU_COUNTER_HOSTTIME);
+
+	printf("CPU: arith=%d, logical=%d\n", (int)GetCounter_CPU_ArithInstr(), (int)GetCounter_CPU_LogicInstr());
+	printf("CPU: shift=%d, branches=%d\n",  (int)GetCounter_CPU_ShiftInstr(), (int)GetCounter_CPU_BranchInstr());
+	printf("CPU: jumps=%d, loadstore=%d\n", (int)GetCounter_CPU_JumpsInstr(), (int)GetCounter_CPU_LoadStoreInstr());
+	printf("CPU: cycles=%d, stalls=%d\n", (int)GetCounter_CPU_CyclesTotal(), (int)GetCounter_CPU_CyclesStall());
+	printf("CPU: hosttime=%d\n", (int)GetCounter_CPU_HostTime());
 	printf("---\n");
+
 #ifdef HELLFIREOS
 	hf_kill(hf_selfid());
 #endif

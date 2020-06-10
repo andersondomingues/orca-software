@@ -5,7 +5,7 @@
 # where you should simple of tasks in each of the cores. 
 #ORCA_APPLICATIONS := dma-driver-test
 #ORCA_APPLICATIONS := mnist
-ORCA_APPLICATIONS := simple
+ORCA_APPLICATIONS := mnist
 
 # Software libraries (experimental)
 #ORCA_LIBS := orca-pubsub orca-monitoring hf-printf orca-baremetal-dma-driver
