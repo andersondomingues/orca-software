@@ -54,8 +54,6 @@ int dma_recv_probe(){
 
 int dma_send_start(int x, int y, char* data_ptr, int size){
 
-
-
     uint16_t first_flit = (x << 4) & y;
     uint16_t second_flit = size;
 
@@ -117,6 +115,6 @@ int dma_recv_start(int* x, int* y, int* size, char* data_ptr){
 
     *x = ((uint16_t*)(data_ptr))[0] >> 4;
     *y = ((uint16_t*)(data_ptr))[0] & 0x00FF;
-	
+
 	return 0; //<<- no reason to fail
 }

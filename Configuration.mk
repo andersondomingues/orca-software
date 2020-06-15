@@ -3,9 +3,7 @@
 # be included in compilation unless you edit the file 
 #          os/hellfireos/orca-core/src/orca-core.cpp,
 # where you should simple of tasks in each of the cores. 
-#ORCA_APPLICATIONS := dma-driver-test
-#ORCA_APPLICATIONS := mnist
-ORCA_APPLICATIONS := mnist
+ORCA_APPLICATIONS := dma-driver-test
 
 # Software libraries (experimental)
 #ORCA_LIBS := orca-pubsub orca-monitoring hf-printf orca-baremetal-dma-driver
