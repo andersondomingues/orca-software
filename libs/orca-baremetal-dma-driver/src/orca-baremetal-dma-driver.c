@@ -54,21 +54,24 @@ int dma_recv_probe(){
 
 int dma_send_start(int x, int y, char* data_ptr, int size){
 
-    uint16_t first_flit = (x << 4) & y;
+    uint16_t first_flit = (x << 4) & (0x00FF | y);
     uint16_t second_flit = size;
+
+	// printf("%x\n", first_flit);
+	printf("");
 
     char buffer[size + 4];
 
+	//copy first two flits into the buffer
     *((uint16_t*)&(buffer[0])) = first_flit;
     *((uint16_t*)&(buffer[2])) = second_flit;
 
+	//copy the payload
     for(int i = 0; i < size; i++)
 		buffer[i + 4] = data_ptr[i];
 	
-	printf("sdsd %d\n", first_flit);
-
-	//wait until previous send to finish (if any)
-	while(*sig_send_status == 0x1);
+	//wait previous send to finish (if any)
+	while(*sig_send_status != 0);
 
 	//configure dma 
 	*sig_size = size + 4;
@@ -77,7 +80,10 @@ int dma_send_start(int x, int y, char* data_ptr, int size){
 	// printf("ni prog size %d, addr 0x%x\n", *sig_size, *sig_addr);
 	//stall and send
 	*sig_send = 0x1;
-    
+	*sig_send = 0x1;
+	*sig_send = 0x1;
+	*sig_send = 0x1;
+
     __asm__ volatile ("nop"); //skip one cycle
 	__asm__ volatile ("nop"); //skip one cycle
 	__asm__ volatile ("nop"); //skip one cycle
@@ -87,8 +93,7 @@ int dma_send_start(int x, int y, char* data_ptr, int size){
 	*sig_send = 0x0;
 	*sig_send = 0x0;
 	*sig_send = 0x0;
-	*sig_send = 0x0;
-
+	
 	return 0; //<<- no reason for failing
 }
 
