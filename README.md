@@ -1,6 +1,6 @@
 # ORCA-SOFTWARE
 
-[![Documentation](https://codedocs.xyz/andersondomingues/orca-sim.svg)](https://codedocs.xyz/andersondomingues/orca-sim/)
+[![Documentation](https://codedocs.xyz/andersondomingues/orca-software.svg)](https://codedocs.xyz/andersondomingues/orca-software/)
 
 ORCA-SOFTWARE is a set of software artifacts that serves as basis for the development of applications for the ORCA MPSOC. This repository includes a copy of the HellfireOS, examples applications, and other integration tools. 
 
