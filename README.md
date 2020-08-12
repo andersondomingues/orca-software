@@ -1,6 +1,8 @@
-# ORCA-SOFTWARE-TOOLS
+# ORCA-SOFTWARE
 
-ORCA-SOFTWARE-TOOLS is a set of software artifacts that serves as basis for the development of applications for the ORCA MPSOC. This repository includes a copy of the HellfireOS, examples applications, and other integration tools. 
+[![Documentation](https://codedocs.xyz/andersondomingues/orca-sim.svg)](https://codedocs.xyz/andersondomingues/orca-sim/)
+
+ORCA-SOFTWARE is a set of software artifacts that serves as basis for the development of applications for the ORCA MPSOC. This repository includes a copy of the HellfireOS, examples applications, and other integration tools. 
 
 - HellfireOS. This repository has a copy of the HellfireOS, a fully-preemptive real-time operating system.
 - Applications. Several applications are provided in the software folder. 
