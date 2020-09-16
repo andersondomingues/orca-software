@@ -43,7 +43,7 @@ CFLAGS += $(PLAT_COMPLINE) $(MODELS_COMPLINE)
 CXXFLAGS += $(PLAT_COMPLINE) $(MODELS_COMPLINE) 
 
 # get the models depedent parameters. 
-include $(ORCA_SIM_DIR)/models/Configuration.mk
+# include $(ORCA_SIM_DIR)/models/Configuration.mk
 
 # concat the required libs and apps to build the image 
 $(foreach module,$(ORCA_APPLICATIONS), $(eval APP_STATIC_LIBS := $(APP_STATIC_LIBS) app-$(module).a))
@@ -80,7 +80,7 @@ $(IMAGE_NAME).bin: $(OS_STATIC_LIB) lib app
 	@echo "$'\033[7m==================================\033[0m"
 	@echo "$'\033[7m  Linking Software ...            \033[0m"
 	@echo "$'\033[7m==================================\033[0m"
-	$(Q)$(LD) $(OS_OBJS) --start-group *.a --end-group $(LDFLAGS) -T$(LINKER_SCRIPT) -o $(IMAGE_NAME).elf 
+	$(Q)$(LD) $(OS_OBJS) --start-group *.a --end-group $(LDFLAGS) -T$(LINKER_SCRIPT) -o $(IMAGE_NAME).elf --defsym=RAM_SIZE=64K
 	$(Q)$(DUMP) --disassemble --reloc $(IMAGE_NAME).elf > $(IMAGE_NAME).lst
 	$(Q)$(DUMP) -h $(IMAGE_NAME).elf > $(IMAGE_NAME).sec
 	$(Q)$(DUMP) -s $(IMAGE_NAME).elf > $(IMAGE_NAME).cnt

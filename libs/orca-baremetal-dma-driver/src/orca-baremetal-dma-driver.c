@@ -31,95 +31,102 @@ volatile uint8_t* sig_stall = (volatile uint8_t*)SIGNAL_CPU_STALL;
 volatile uint8_t* sig_intr  = (volatile uint8_t*)SIGNAL_CPU_INTR;
 
 //signals to start the ni
-volatile uint8_t* sig_send  = (volatile uint8_t*)SIGNAL_PROG_SEND;
-volatile uint8_t* sig_recv  = (volatile uint8_t*)SIGNAL_PROG_RECV;
-
-//signals to check on ni statuses
-volatile uint8_t*  sig_send_status = (volatile uint8_t*)SIGNAL_SEND_STATUS;
-volatile uint32_t* sig_recv_status = (volatile uint32_t*)SIGNAL_RECV_STATUS;
+volatile uint32_t* sig_status = (volatile uint32_t*)SIGNAL_STATUS;
 
 //signals to ni programming
 volatile uint32_t* sig_addr = (volatile uint32_t*)SIGNAL_PROG_ADDR;
 volatile uint32_t* sig_size = (volatile uint32_t*)SIGNAL_PROG_SIZE;
 
-
-//this method will report zero
-//only if no packet if at the 
-//input. otherwise, it will report
-//the size of the incoming packet 
-//in bytes
 int dma_recv_probe(){
-    return *sig_recv_status;
+    return (*sig_status & 0x0000ffff) + 2;
 }
 
-int dma_send_start(int x, int y, char* data_ptr, int size){
+// 0111 1111 1111 1111 
+int dma_init(){
+	return *sig_status = (*sig_status) & 0x7fffffff;
+}
 
-    uint16_t first_flit = (x << 4) & (0x00FF | y);
-    uint16_t second_flit = size;
+void dma_set_size(uint32_t size){
+	*sig_size = size;
+}
 
-	// printf("%x\n", first_flit);
-	printf("");
+void dma_set_addr(uint32_t addr){
+	*sig_addr = addr;
+}
 
-    char buffer[size + 4];
+void dma_set_recv_start(uint32_t flag){
+	*sig_status = (flag)
+		? (*sig_status | 0x20000000)
+		: (*sig_status & ~0x20000000);
+}
 
-	//copy first two flits into the buffer
-    *((uint16_t*)&(buffer[0])) = first_flit;
-    *((uint16_t*)&(buffer[2])) = second_flit;
+void dma_set_send_start(int value){
+	*sig_status = (value) 
+		? *sig_status | 0x40000000
+		: *sig_status & ~0x40000000;		
+}
+
+// 0100 0000 0000 0000
+int dma_get_send_start(){
+	return (*sig_status & 0x40000000) > 0;
+}
+
+// 0010 0000 0000 0000
+int dma_get_recv_start(){
+	return (*sig_status & 0x20000000) > 0;
+}
+
+void dma_send_start(uint32_t x, uint32_t y, uint8_t* data_ptr, uint32_t size){
+
+	// pack address into first flit 
+    uint32_t first_flit = (x << 8) | (0x000000FF & y);
+
+	// pack number of flits into second flit (data size)
+	// (size >> 2)  ==> size / 4
+	// (0x00000003 | size) ===> size % 4
+	uint32_t second_flit = (size >> 2) + !((0x00000003 & size) == 0);
+	
+	// create a new buffer
+    uint32_t buffer[second_flit + 2];
+	buffer[0] = first_flit;
+	buffer[1] = second_flit;
 
 	//copy the payload
-    for(int i = 0; i < size; i++)
-		buffer[i + 4] = data_ptr[i];
-	
-	//wait previous send to finish (if any)
-	while(*sig_send_status != 0);
+    for(int i = 0; i < second_flit; i++)
+		buffer[i + 2] = ((uint32_t*)data_ptr)[i];
 
 	//configure dma 
-	*sig_size = size + 4;
-	*sig_addr = (uint32_t)buffer;
+	dma_set_size(second_flit + 2);
+	dma_set_addr((uint32_t)&buffer);
 	
-	// printf("ni prog size %d, addr 0x%x\n", *sig_size, *sig_addr);
-	//stall and send
-	*sig_send = 0x1;
-	*sig_send = 0x1;
-	*sig_send = 0x1;
-	*sig_send = 0x1;
-
+	//stall and send, skip one cycle (TODO: necessary?)
+	dma_set_send_start(1);
     __asm__ volatile ("nop"); //skip one cycle
-	__asm__ volatile ("nop"); //skip one cycle
-	__asm__ volatile ("nop"); //skip one cycle
-	__asm__ volatile ("nop"); //skip one cycle
 	
 	//flag off 
-	*sig_send = 0x0;
-	*sig_send = 0x0;
-	*sig_send = 0x0;
-	
-	return 0; //<<- no reason for failing
+	dma_set_send_start(0);
 }
 
-int dma_recv_start(int* x, int* y, int* size, char* data_ptr){
+uint32_t dma_recv_start(uint32_t* x, uint32_t* y, uint32_t* size, uint8_t* data_ptr){
 
-    //cannot receive without 
-    //a packet at the input
+    // cannot receive without 
+    // a packet at the input
     if(!dma_recv_probe()) return -1;
 
-	//configure dma 
-	*sig_size = dma_recv_probe();
-	*sig_addr = (uint32_t)data_ptr;
+	// configure dma 
+	dma_set_size(dma_recv_probe());
+	dma_set_addr((uint32_t)data_ptr);
 	
-    *size = *sig_size;
+    *size = dma_recv_probe();
 
-	//stall and recv
-	*sig_recv = 0x1;
+	dma_set_recv_start(1);
+	__asm__ volatile ("nop");
 	
-	//hold the cpu until no size is given
-	while(*sig_recv_status != 0x0);
-	
-	//flag off 
-	*sig_recv = 0x0;
+	dma_set_recv_start(0);
 
-    *x = ((uint16_t*)(data_ptr))[0] >> 4;
-    *y = ((uint16_t*)(data_ptr))[0] & 0x00FF;
+	*y = data_ptr[0];
+	*x = data_ptr[1];
 
-	return 0; //<<- no reason to fail
+	uint32_t reported_size = data_ptr[4];
+	return (*size != reported_size);
 }

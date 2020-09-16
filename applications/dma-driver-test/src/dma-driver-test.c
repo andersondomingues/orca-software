@@ -4,29 +4,37 @@
 
 int main(){
 
-	char buffer[BUFFER_SIZE];
+	uint8_t buffer[BUFFER_SIZE];
+
+	dma_init();
 
 	//periodically bursts messages through the network 
 	while(1){
 
 		//holds until data is available from the 
 		//network
-		while(!dma_recv_probe());
+		// while(!dma_recv_probe());
 
-		int x, y, size;
+		uint32_t x = 0;
+		uint32_t y = 0;
+		uint32_t size = 10;
 
-		//receive data
-		dma_recv_start(&x, &y, &size, buffer);
-
-		printf("app: received \"%s\" from x=%x y=%d (%d bytes)\n", &buffer[4], x, y, size);
-
-		//change data
-		for(int i = 0; i < size; i++)
-			if(buffer[i] != '\0')
-				buffer[i]++;
+		for(int i = 0; i < 10; i++){
+			buffer[i] = i + 10;
+		}
 
 		//push data back to the network
 		dma_send_start(x, y, buffer, size);
-		printf("app: replied \"%s\"\n", &buffer[4]);
+
+		while(dma_recv_probe()){
+			dma_recv_start(&x, &y, &size, buffer);
+		}
+
+		for(int i = 0; i < 10; i++){
+			buffer[i] = buffer[i] + 1;
+		}
+
+		//push data back to the network
+		dma_send_start(x, y, buffer, size);
 	}
 }

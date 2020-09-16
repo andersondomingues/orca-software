@@ -39,7 +39,7 @@ rom		: ORIGIN = FLASH_OFF, LENGTH = FLASH_SIZE  /* ROM area*/
 ram		: ORIGIN = RAM_OFF,   LENGTH = RAM_SIZE	   /* RAM area. */
 }
 
-/** 8K bytes of heap by default. configurable with a define*/
+/** 8K bytes of stack by default. configurable with a define*/
 STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x2000;
 /** 4K bytes of heap by default. if using newlib, it is recommended to use at least 2Kbytes. configurable with a define*/
 HEAP_SIZE  = DEFINED(HEAP_SIZE)  ? HEAP_SIZE  : 0x1000;
