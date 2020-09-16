@@ -37,8 +37,20 @@ volatile uint32_t* sig_status = (volatile uint32_t*)SIGNAL_STATUS;
 volatile uint32_t* sig_addr = (volatile uint32_t*)SIGNAL_PROG_ADDR;
 volatile uint32_t* sig_size = (volatile uint32_t*)SIGNAL_PROG_SIZE;
 
+//tile id
+volatile uint32_t* sig_tile_id = (volatile uint32_t*)SIGNAL_TILE_ID;
+
+int dma_get_addr_x(){
+	return ((char*)sig_tile_id)[1];
+}
+
+int dma_get_addr_y(){
+	return ((char*)sig_tile_id)[0];
+}
+
+
 int dma_recv_probe(){
-    return (*sig_status & 0x0000ffff) + 2;
+    return (*sig_status & 0x0000ffff);
 }
 
 // 0111 1111 1111 1111 

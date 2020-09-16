@@ -53,7 +53,7 @@
 // tile indentifier, hardware fixed
 // #define MAGIC_TILE_ID       0x40411000
 
-#define MAGIC_TILE_ID       0xe0ff8000
+#define SIGNAL_TILE_ID      0xe0ff8000
 #define SIGNAL_STATUS       0xe0ff8010
 #define SIGNAL_PROG_ADDR    0xe0ff8020  /* 32 bits */
 #define SIGNAL_PROG_SIZE    0xe0ff8030
