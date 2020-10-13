@@ -26,39 +26,23 @@
 #ifndef _ORCA_BAREMETAL_DMA_DRIVER_H
 #define _ORCA_BAREMETAL_DMA_DRIVER_H
 
-// #include "/home/adomingues/gaph/orca-sim/platforms/hfriscv-with-extcomm/include/MemoryMap.h"
-
-// @TODO maybe move these to the Configuration.mk file
-#define ORCA_MEMORY_BASE_1 0x00000000
-#define ORCA_MEMORY_SIZE_1 0x00000080
-#define ORCA_MEMORY_BASE_2 0x00000080
-#define ORCA_MEMORY_SIZE_2 0x00000080
-
-// control wires (cpu <-> dma)
-#define SIGNAL_CPU_STALL    0x40410000  /* 8 bits */
-#define SIGNAL_CPU_INTR     0x40410001
-// #define SIGNAL_SEND_STATUS  0x40410002
-// 0x40410003
-// #define SIGNAL_RECV_STATUS  0x40410004
-// 0x40410005
-// 0x40410006
-// 0x40410007
-// #define SIGNAL_PROG_SEND    0x40410008
-// #define SIGNAL_PROG_RECV    0x40410009
-// 0x4041000A
-// 0x4041000B
-// #define SIGNAL_PROG_ADDR    0x4041000C  /* 32 bits */
-// #define SIGNAL_PROG_SIZE    0x40410010
-
-// tile indentifier, hardware fixed
-// #define MAGIC_TILE_ID       0x40411000
+#define SIGNAL_CPU_INTR     0xe1f00410
 
 #define SIGNAL_TILE_ID      0xe0ff8000
 #define SIGNAL_STATUS       0xe0ff8010
-#define SIGNAL_PROG_ADDR    0xe0ff8020  /* 32 bits */
+#define SIGNAL_PROG_ADDR    0xe0ff8020
 #define SIGNAL_PROG_SIZE    0xe0ff8030
 
+#define SIGNAL_DESTINATION  0xe0ff8040
+
 #include <inttypes.h>
+
+struct ni_packet_t{
+	uint16_t x;
+	uint16_t y;
+	uint32_t payload_size;
+	uint32_t payload_data[1];
+};
 
 int dma_init();
 /**
@@ -68,6 +52,8 @@ int dma_init();
  * @return int Returns 1 when a packet is available, Zero otherwise. 
  */
 int dma_recv_probe();
+
+int get_irq();
 
 /**
  * @brief Sends a packet through the network
@@ -79,7 +65,7 @@ int dma_recv_probe();
  * @return int Returns Zero is data is succefully transmitted, 
  *  error code otherwirse.
  */
-uint32_t dma_recv_start(uint32_t* x, uint32_t* y, uint32_t* size, uint8_t* data_ptr);
+uint32_t dma_recv_start(struct ni_packet_t* pkt);
 
 /**
  * @brief Receives a packet from the network.
@@ -91,6 +77,11 @@ uint32_t dma_recv_start(uint32_t* x, uint32_t* y, uint32_t* size, uint8_t* data_
  * @return int Returns Zero if the packet has being succefully received, -1
  * if there are no packets to be received, error code otherwise.
  */
-void dma_send_start(uint32_t x, uint32_t y, uint8_t* data_ptr, uint32_t size);
+void dma_send_start(struct ni_packet_t* pkt);
+
+
+int dma_get_addr_x();
+
+int dma_get_addr_y();
 
 #endif // _ORCA_BAREMETAL_DMA_DRIVER_H

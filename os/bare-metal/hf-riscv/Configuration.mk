@@ -73,7 +73,6 @@ ASMFLAGS += -march=rv32im -mabi=ilp32 -fPIC
 C_CPP_FLAGS += \
 	-march=rv32im -mabi=ilp32 \
 	-Wall \
-	-O2 \
 	-Os \
 	$(DEFINES) \
 	-ffreestanding \

@@ -27,7 +27,6 @@
 #include <stdio.h>
 
 //cpu-specific signals
-volatile uint8_t* sig_stall = (volatile uint8_t*)SIGNAL_CPU_STALL;
 volatile uint8_t* sig_intr  = (volatile uint8_t*)SIGNAL_CPU_INTR;
 
 //signals to start the ni
@@ -37,15 +36,22 @@ volatile uint32_t* sig_status = (volatile uint32_t*)SIGNAL_STATUS;
 volatile uint32_t* sig_addr = (volatile uint32_t*)SIGNAL_PROG_ADDR;
 volatile uint32_t* sig_size = (volatile uint32_t*)SIGNAL_PROG_SIZE;
 
+//address to which the ni would sent the pkt
+volatile uint32_t* sig_dest = (volatile uint32_t*)SIGNAL_DESTINATION;
+
 //tile id
 volatile uint32_t* sig_tile_id = (volatile uint32_t*)SIGNAL_TILE_ID;
 
+int get_irq(){
+	return *sig_intr & 0x00000001; 
+}
+
 int dma_get_addr_x(){
-	return ((char*)sig_tile_id)[1];
+	return (*sig_tile_id >> 8) & 0x000000ff;
 }
 
 int dma_get_addr_y(){
-	return ((char*)sig_tile_id)[0];
+	return (*sig_tile_id & 0x000000ff);
 }
 
 
@@ -88,28 +94,20 @@ int dma_get_recv_start(){
 	return (*sig_status & 0x20000000) > 0;
 }
 
-void dma_send_start(uint32_t x, uint32_t y, uint8_t* data_ptr, uint32_t size){
 
-	// pack address into first flit 
-    uint32_t first_flit = (x << 8) | (0x000000FF & y);
-
-	// pack number of flits into second flit (data size)
-	// (size >> 2)  ==> size / 4
-	// (0x00000003 | size) ===> size % 4
-	uint32_t second_flit = (size >> 2) + !((0x00000003 & size) == 0);
+void dma_set_destination(int x, int y){
 	
-	// create a new buffer
-    uint32_t buffer[second_flit + 2];
-	buffer[0] = first_flit;
-	buffer[1] = second_flit;
+	*sig_dest = (x << 8) | (y & 0x000000FF);
+	*sig_dest &= 0x0000FFFF;
+	// 0000 0000 0000 0000 0000 0000 0000 0000 
+}
 
-	//copy the payload
-    for(int i = 0; i < second_flit; i++)
-		buffer[i + 2] = ((uint32_t*)data_ptr)[i];
-
+void dma_send_start(struct ni_packet_t* pkt){
+	
 	//configure dma 
-	dma_set_size(second_flit + 2);
-	dma_set_addr((uint32_t)&buffer);
+	dma_set_destination(pkt->x, pkt->y);
+	dma_set_size(pkt->payload_size);
+	dma_set_addr((uint32_t)(pkt->payload_data));
 	
 	//stall and send, skip one cycle (TODO: necessary?)
 	dma_set_send_start(1);
@@ -119,26 +117,24 @@ void dma_send_start(uint32_t x, uint32_t y, uint8_t* data_ptr, uint32_t size){
 	dma_set_send_start(0);
 }
 
-uint32_t dma_recv_start(uint32_t* x, uint32_t* y, uint32_t* size, uint8_t* data_ptr){
+
+uint32_t dma_recv_start(struct ni_packet_t* pkt){
 
     // cannot receive without 
     // a packet at the input
     if(!dma_recv_probe()) return -1;
 
 	// configure dma 
-	dma_set_size(dma_recv_probe());
-	dma_set_addr((uint32_t)data_ptr);
+	dma_set_size(pkt->payload_size);
+	dma_set_addr((uint32_t)(pkt->payload_data));
 	
-    *size = dma_recv_probe();
+	uint32_t expected_size = dma_recv_probe();
 
 	dma_set_recv_start(1);
 	__asm__ volatile ("nop");
 	
 	dma_set_recv_start(0);
 
-	*y = data_ptr[0];
-	*x = data_ptr[1];
-
-	uint32_t reported_size = data_ptr[4];
-	return (*size != reported_size);
+	// return number dropped flits
+	return expected_size - pkt->payload_size;
 }

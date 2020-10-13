@@ -4,32 +4,45 @@
 
 int main(){
 
-	uint8_t buffer[BUFFER_SIZE];
+	uint32_t buffer[BUFFER_SIZE];
+	struct ni_packet_t* pkt = (struct ni_packet_t*)&buffer;
+
+	uint32_t buffer2[BUFFER_SIZE];
+	struct ni_packet_t* pkt2 = (struct ni_packet_t*)&buffer2;
 
 	dma_init();
 
-	uint32_t x = 0;
-	uint32_t y = 0;
-	uint32_t size = 10;
+	pkt->x = 0;
+	pkt->y = 0;
+	pkt->payload_size = 10;
+
+	pkt2->x = 0;
+	pkt2->y = 0;
+	pkt2->payload_size = 10;
 
 	for(int i = 0; i < 10; i++){
-		buffer[i] = i + 10;
+		(pkt->payload_data)[i] = i + 10;
 	}
 
 	//push data back to the network
-	dma_send_start(x, y, buffer, size);
+	dma_send_start(pkt);
 
 	while(!dma_recv_probe());
-	
-	dma_recv_start(&x, &y, &size, buffer);
-	
+
+	while(!get_irq());
+
+	dma_recv_start(pkt2);
+
 	for(int i = 0; i < 10; i++){
-		buffer[i] = buffer[i] + 1;
+		(pkt2->payload_data)[i] = (pkt2->payload_data)[i] + 1;
 	}
 
-	//push data back to the network
-	dma_send_start(x, y, buffer, size);
+	(pkt2->payload_data)[0] = dma_get_addr_x();
+	(pkt2->payload_data)[1] = dma_get_addr_y();
 
+	//push data back to the network
+	dma_send_start(pkt2);
+	
 	//SYSCALL
 	return 0;
 }
